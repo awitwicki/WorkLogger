@@ -1,0 +1,35 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<MudText Typo="Typo.h4">Hello, world!</MudText>
+
+<MudContainer Class="mt-6">
+    <MudAlert Severity="Severity.Success" Class="mt-16">Welcome to your new app.</MudAlert>
+</MudContainer>
+
+
+<MudText Typo="Typo.h6">How is Blazor working for you?</MudText>
+
+<AuthorizeView>
+    <Authorized>
+        This content is displayed only if the user is Authorized
+
+        @if (@context.User.IsInRole(Consts.AdminRole))
+        {
+           <h1>You have <b>Admin</b> role</h1>
+        }
+
+    </Authorized>
+    <NotAuthorized>
+        This content is displayed if the user is Not Authorized
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView>
+    <Authorized>
+        <NavLink class="nav-link" href="/identity/account/logout" Match="NavLinkMatch.All">
+            <span class="oi oi-power-standby" aria-hidden="true"></span> Logout 
+        </NavLink>
+    </Authorized>
+</AuthorizeView>

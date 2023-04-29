@@ -1,0 +1,34 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using Blazor_starter.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p class="pb-4">This component demonstrates fetching data from a service.</p>
+
+<MudTable Items="@forecasts" Hover="true" Loading="@(forecasts == null)" Breakpoint="Breakpoint.Sm" >
+    <HeaderContent>
+        <MudTh>Date</MudTh>
+        <MudTh>Temp. (C)</MudTh>
+        <MudTh>Temp. (F)</MudTh>
+        <MudTh>Summary</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Date.ToShortDateString()</MudTd>
+        <MudTd>@context.TemperatureC</MudTd>
+        <MudTd>@context.TemperatureF</MudTd>
+        <MudTd>@context.Summary</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private WeatherForecast[]? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+}
