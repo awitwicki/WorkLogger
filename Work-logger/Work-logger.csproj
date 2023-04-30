@@ -27,5 +27,8 @@
 		<PackageReference Include="MudBlazor" Version="6.1.7" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\WorkLogger.Domain\WorkLogger.Domain.csproj" />
+	</ItemGroup>
 
 </Project>

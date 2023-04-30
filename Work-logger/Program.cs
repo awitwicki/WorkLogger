@@ -3,6 +3,7 @@ using WorkLogger.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using WorkLogger.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,8 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddMudServices();
+
+builder.Services.AddScoped<IMonthDayService, MonthDayService>();
 
 builder.Services.AddSingleton<WeatherForecastService>();
 
