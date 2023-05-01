@@ -1,6 +1,6 @@
 ﻿@page "/month"
 
-@* TODO: attribute [Authorize(Roles=Consts.AdminRole)] *@
+@attribute [Authorize(Roles = Consts.AdminRole + "," + Consts.UserRole + "," + Consts.ModeratorRole)]
 
 @using WorkLogger.Domain.ViewModels
 @using WorkLogger.Domain.Services
