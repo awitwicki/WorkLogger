@@ -2,7 +2,7 @@
 
 public class MonthWorkDayItem
 {
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public TimeSpan? StartHour { get; set; }
     public TimeSpan? EndHour { get; set; }
     public bool IsVacation { get; set; }

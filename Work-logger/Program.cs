@@ -3,9 +3,10 @@ using WorkLogger.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.Services;
 using WorkLogger.Infrastructure.Database;
-using WorkLogger.Services;
+using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddMudServices();
+
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
 

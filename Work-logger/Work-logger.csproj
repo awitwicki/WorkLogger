@@ -7,6 +7,7 @@
 		<RootNamespace>WorkLogger</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
@@ -31,6 +32,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\WorkLogger.Domain\WorkLogger.Domain.csproj" />
 	  <ProjectReference Include="..\WorkLogger.Infrastructure\WorkLogger.Infrastructure.csproj" />
+	  <ProjectReference Include="..\WorkLogger.Services\WorkLogger.Services.csproj" />
 	</ItemGroup>
 
 </Project>

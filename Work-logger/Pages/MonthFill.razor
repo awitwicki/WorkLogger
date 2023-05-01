@@ -2,8 +2,9 @@
 
 @* TODO: attribute [Authorize(Roles=Consts.AdminRole)] *@
 
-@using WorkLogger.Domain.Services
 @using WorkLogger.Domain.ViewModels
+@using WorkLogger.Domain.Services
+@using System.Security.Claims
 @inject ISnackbar Snackbar
 @inject IMonthDayService MonthDayService
 
@@ -22,26 +23,26 @@
         </ColGroup>
     <HeaderContent>
         <MudTh>Date</MudTh>
-        <MudTh>Start</MudTh>
-        <MudTh>End</MudTh>
+        <MudTh>StartHour</MudTh>
+        <MudTh>EndHour</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>@context.Date.ToShortDateString()</MudTd>
+        <MudTd>@context.Date.Date.ToShortDateString()</MudTd>
         <MudTd>
             @if (!context.IsDisabled)
             {
-                <MudText Typo="Typo.body1">@context.Start?.ToString(@"hh\:mm")</MudText>
+                <MudText Typo="Typo.body1">@context.StartHour?.ToString(@"hh\:mm")</MudText>
             }
         </MudTd>
         <MudTd>
             @if (!context.IsDisabled)
             {
-                <MudText Typo="Typo.body1">@context.End?.ToString(@"hh\:mm")</MudText>
+                <MudText Typo="Typo.body1">@context.EndHour?.ToString(@"hh\:mm")</MudText>
             }
         </MudTd>
     </RowTemplate>
     <RowEditingTemplate>
-        <MudTd>@context.Date.ToShortDateString()
+        <MudTd>@context.Date.Date.ToShortDateString()
             @if (!context.IsDayOff)
             {
                 <MudCheckBox Label="Vacation" @bind-Checked="@context.IsVacation" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
@@ -52,10 +53,10 @@
             }
         </MudTd>
         <MudTd>
-            <MudTimePicker Label="Start" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.Start" Disabled="@context.IsDisabled"/>
+            <MudTimePicker Label="StartHour" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.StartHour" Disabled="@context.IsDisabled"/>
         </MudTd>
         <MudTd>
-            <MudTimePicker Label="End" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.End" Disabled="@context.IsDisabled"/>
+            <MudTimePicker Label="EndHour" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.EndHour" Disabled="@context.IsDisabled"/>
         </MudTd>
     </RowEditingTemplate>
     <EditButtonContent Context="button">
@@ -69,17 +70,27 @@
 
 @code {
     private IEnumerable<MonthDayFormItem>? _workDays;
+    
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+    ClaimsPrincipal _user;
+    string _userId = "";
 
     protected override async Task OnInitializedAsync()
     {
-        _workDays = await MonthDayService.BuildMonth(DateTime.Now);
+        _user = (await AuthStat).User;
+        
+        // TODO:
+        // Refactor to single method
+        // Get user Id
+        _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        
+        _workDays = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
     }
     
     private async Task Save()
     {
+        await MonthDayService.SaveMonth(_workDays!, DateTimeOffset.UtcNow, _userId);
+
         Snackbar.Add("Month working hours saved");
-        
-        // TODO
-        //await MonthDayService.SaveMonth(_workDays);
     }
 }
