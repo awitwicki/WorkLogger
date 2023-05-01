@@ -1,9 +1,18 @@
-﻿using WorkLogger.Domain.ViewModels;
+﻿using WorkLogger.Domain.Services;
+using WorkLogger.Domain.ViewModels;
+using WorkLogger.Infrastructure.Database;
 
-namespace WorkLogger.Domain.Services;
+namespace WorkLogger.Services;
 
 public class MonthDayService : IMonthDayService
 {
+    private readonly ApplicationDbContext _context;
+    
+    public MonthDayService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+    
     public ValueTask<IEnumerable<MonthDayFormItem>> BuildMonth(DateTime date)
     {
         var days = DateTime.DaysInMonth(date.Year, date.Month);

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using WorkLogger.Domain.Services;
+using WorkLogger.Infrastructure.Database;
+using WorkLogger.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,9 +19,8 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
-                 //.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")) Dont forget to create migration!
-                   .UseInMemoryDatabase("InMemoryDb")
-                   );
+        .LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
+        .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
@@ -50,25 +51,23 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     // Migration
-    if (context.Database.IsSqlServer())
+    if (context.Database.IsNpgsql())
     {
         context.Database.Migrate();
     }
 
     // Init roles
-    {
-        var _roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+  var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // Create all roles
-        foreach (var roleName in Consts.RolesList)
-        {
-            var roleExists = _roleManager.FindByNameAsync(roleName).Result;
-            if (roleExists == null)
-            {
-                _roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
-            }
-        }
-    }
+  // Create all roles
+  foreach (var roleName in Consts.RolesList)
+  {
+      var roleExists = roleManager.FindByNameAsync(roleName).Result;
+      if (roleExists == null)
+      {
+          roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
+      }
+  }
 }
 
 app.UseHttpsRedirection();
