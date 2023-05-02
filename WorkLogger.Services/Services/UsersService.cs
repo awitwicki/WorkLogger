@@ -8,10 +8,12 @@ namespace WorkLogger.Services.Services;
 public class UsersService : IUsersService
 {
     private readonly ApplicationDbContext _dbContext;
+    public UserManager<IdentityUser> _userManager { get; set; }
     
-    public UsersService(ApplicationDbContext context)
+    public UsersService(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager)
     {
-        _dbContext = context;
+        _dbContext = dbContext;
+        _userManager = userManager;
     }
         
     public async Task<List<UserViewModel>> GetUsers()
@@ -34,5 +36,40 @@ public class UsersService : IUsersService
             .ToListAsync();
 
         return normalizedUsersViewModel;
+    }
+    
+    public async Task AddRoleToUser(string userId, string role)
+    {
+        IdentityUser user = new IdentityUser { Id = userId };
+
+        await _userManager.AddToRoleAsync(user, role);
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<string>> GetUserRoles(string userId)
+    {
+        IdentityUser user = new IdentityUser { Id = userId };
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        return userRoles;
+    }
+
+    public async Task CleanUserRoles(string userId)
+    {
+        IdentityUser user = new IdentityUser { Id = userId };
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+        await _userManager.RemoveFromRolesAsync(new IdentityUser { Id = userId }, userRoles);
+
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<IdentityRole>> GetAllRoles()
+    {
+        return await _dbContext.Roles
+            .AsNoTracking()
+            .ToListAsync();
     }
 }

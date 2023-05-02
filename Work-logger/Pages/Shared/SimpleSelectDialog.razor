@@ -1,0 +1,41 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudText>@ContentText</MudText>
+        <MudSelect T="SimpleSelectDialogItem" @bind-Value="selectedValue" Label="@SelectLabelText" ToStringFunc="@_converter" Variant="Variant.Filled" AnchorOrigin="Origin.BottomCenter">
+            @foreach (var item in Items)
+            {
+                <MudSelectItem Value="@item"/>
+            }
+        </MudSelect>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="@Color" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string ContentText { get; set; }
+
+    [Parameter] public string SelectLabelText { get; set; }
+
+    [Parameter] public string ButtonText { get; set; }
+
+    [Parameter] public Color Color { get; set; }
+
+    [Parameter] public List<SimpleSelectDialogItem> Items { get; set; }
+
+    SimpleSelectDialogItem selectedValue { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(selectedValue));
+    void Cancel() => MudDialog.Cancel();
+
+    public class SimpleSelectDialogItem {
+        public object Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    Func<SimpleSelectDialogItem, string> _converter = p => p?.Name!;
+}

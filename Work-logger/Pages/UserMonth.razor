@@ -5,6 +5,9 @@
 @using WorkLogger.Domain.ViewModels
 @using WorkLogger.Services.Services
 @using WorkLogger.Domain.Services
+@using WorkLogger.Pages.Shared
+
+@inject IDialogService DialogService
 @inject IUsersService UsersService
 @inject IMonthDayService MonthDayService
 
@@ -25,10 +28,23 @@
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
-                        <MudButton Variant="Variant.Filled"
+                        <MudButton Class="my-2"
+                                   Variant="Variant.Filled"
+                                   OnClick="@(() => AddUserRole(user.User.Id))"
+                                   Color="Color.Primary">
+                            Add role
+                        </MudButton>
+                        <MudButton Class="my-2"
+                                   Variant="Variant.Filled"
+                                   OnClick="@(() => ClearUserRoles(user.User.Id))"
+                                   Color="Color.Error">
+                            Clear roles
+                        </MudButton>
+                        <MudButton Class="my-2"
+                                   Variant="Variant.Filled"
                                    EndIcon="@Icons.Material.Filled.CalendarMonth"
-                                   Color="Color.Primary"
-                                   OnClick="@(() => LoadUser(user))">
+                                   OnClick="@(() => LoadUser(user))"
+                                   Color="Color.Primary">
                             User workdays
                         </MudButton>
                     </MudCardContent>
@@ -46,7 +62,7 @@ else
             Return
         </MudButton>
 
-        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.SelectedMonth.DateMonth.DateTime.ToShortDateString()</MudText>
+        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.SelectedMonth.DateMonth.DateTime.ToString("MM.yyyy")</MudText>
         
         <MudTable Class="mt-4" Items="@_selectedUser.SelectedMonth.Days" Breakpoint="Breakpoint.Sm" Dense="@true"
                   Hover="@true">
@@ -110,8 +126,9 @@ else
                     <MudPaper>
                         <MudCardHeader>
                             <CardHeaderContent>
-                                <MudText Typo="Typo.h6">@month.DateMonth.DateTime.ToShortDateString()</MudText>
-                                <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@month.Days.Count(x => x.StartHour != null) work days</MudText>
+                                <MudText Typo="Typo.h6">@month.DateMonth.DateTime.ToString("MM.yyyy")</MudText>
+                                <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@month.Days.Count(x => !x.IsDayOff && !x.IsVacation) work days</MudText>
+                                <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@month.Days.Count(x => x.IsVacation) vacation days</MudText>
                             </CardHeaderContent>
                         </MudCardHeader>
                         <MudCardContent>
@@ -146,5 +163,55 @@ else
             User = user,
             UserWorkMonths = await MonthDayService.GetUserMonths(user.User.Id)
         };
+    }
+    
+    async Task AddUserRole(string userId)
+    {
+        var roles = await UsersService.GetAllRoles();
+        var rolesStr = roles.Select(x => new SimpleSelectDialog.SimpleSelectDialogItem { Id = x.Id, Name = x.Name }).ToList();
+
+        var parameters = new DialogParameters();
+
+        parameters.Add("SelectLabelText", "Role");
+        parameters.Add("ContentText", "Select user role ");
+        parameters.Add("ButtonText", "Dodaj");
+        parameters.Add("Color", Color.Success);
+        parameters.Add("Items", rolesStr);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = DialogService.Show<SimpleSelectDialog>("Select Role", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled && (SimpleSelectDialog.SimpleSelectDialogItem)result.Data != null)
+        {
+            await UsersService.AddRoleToUser(userId, ((SimpleSelectDialog.SimpleSelectDialogItem)result.Data).Name);
+
+            _users = await UsersService.GetUsers();
+            
+            StateHasChanged();
+        }
+    }
+    
+    async Task ClearUserRoles(string userId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Confirm removing all user roles!");
+        parameters.Add("ButtonText", "Remove");
+        parameters.Add("Color", Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = DialogService.Show<DeleteDialog>("Remove Role", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled && (bool)result.Data == true)
+        {
+            await UsersService.CleanUserRoles(userId);
+
+            _users = await UsersService.GetUsers();
+            
+            StateHasChanged();
+        }
     }
 }
