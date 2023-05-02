@@ -35,6 +35,7 @@ builder.Services.AddMudServices();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
 
 builder.Services.AddSingleton<WeatherForecastService>();
 

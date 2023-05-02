@@ -1,11 +1,11 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Dashboard</MudNavLink>
     <MudNavLink Href="/month" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CalendarToday">Month</MudNavLink>
-    <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Countertops">Counter</MudNavLink>
+    
+    <AuthorizeView Roles="@(Consts.AdminRole + ", " + Consts.ModeratorRole)">
+        <MudNavLink Href="/user-month" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DataExploration">Users work days</MudNavLink>
+    </AuthorizeView>
+    
     <MudNavLink Href="/fetchdata" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DataExploration">Fetch data</MudNavLink>
     <MudNavLink Href="/identity/account/login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login">Login</MudNavLink>
-    <MudNavGroup Title="Settings" Expanded="true">
-        <MudNavLink Href="/" Match="NavLinkMatch.Prefix">Custom nested link</MudNavLink>
-        <MudNavLink Href="/" Match="NavLinkMatch.Prefix">Custom nested link</MudNavLink>
-    </MudNavGroup>
 </MudNavMenu>

@@ -1,0 +1,42 @@
+﻿@page "/user-month"
+
+@attribute [Authorize(Roles = Consts.AdminRole + "," + Consts.ModeratorRole)]
+
+@using WorkLogger.Domain.ViewModels
+@using WorkLogger.Services.Services
+@inject IUsersService UsersService
+
+<MudGrid>
+    @foreach (var user in _users)
+    {
+        <MudItem xs="4">
+        <MudPaper>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">@user.User.Email</MudText>
+                        @foreach(var userRole in user.UserRoles)
+                        {
+                            <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@userRole</MudText>
+                        }
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudButton Variant="Variant.Filled"
+                               EndIcon="@Icons.Material.Filled.CalendarMonth"
+                               Color="Color.Primary">
+                        User workdays
+                    </MudButton>
+                </MudCardContent>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    IEnumerable<UserViewModel> _users = new List<UserViewModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await UsersService.GetUsers();
+    }
+}

@@ -15,6 +15,12 @@
             <MudText Typo="Typo.h6">Work logger</MudText>
             <MudSpacer/>
             <MudIconButton Icon="@ThemeBtnIcon" Color="Color.Inherit" OnClick="ToggleTheme"/>
+            <MudButton Href="/identity/account/logout"
+                       Variant="Variant.Text"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Color="Color.Inherit">
+                Logout
+            </MudButton>
         </MudAppBar>
 
         <MudDrawer @bind-Open="@_drawerOpen" Elevation="1">
