@@ -106,4 +106,13 @@ public class MonthDayService : IMonthDayService
         
         // TODO deattach entity
     }
+
+    public ValueTask<IEnumerable<MonthWorkDay>> GetUserMonths(string userId)
+    {
+        var months = _context.MonthWorkDays.AsNoTracking()
+            .Where(x => x.EmployeeId == userId)
+            .OrderByDescending(x => x.DateMonth);
+
+        return ValueTask.FromResult(months.AsEnumerable());
+    }
 }

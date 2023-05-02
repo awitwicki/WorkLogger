@@ -4,39 +4,140 @@
 
 @using WorkLogger.Domain.ViewModels
 @using WorkLogger.Services.Services
+@using WorkLogger.Domain.Services
 @inject IUsersService UsersService
+@inject IMonthDayService MonthDayService
 
-<MudGrid>
-    @foreach (var user in _users)
+@if (_selectedUser == null)
+{
+    <MudGrid>
+        @foreach (var user in _users)
+        {
+            <MudItem xs="4">
+                <MudPaper>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@user.User.Email</MudText>
+                            @foreach(var userRole in user.UserRoles)
+                            {
+                                <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@userRole</MudText>
+                            }
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudButton Variant="Variant.Filled"
+                                   EndIcon="@Icons.Material.Filled.CalendarMonth"
+                                   Color="Color.Primary"
+                                   OnClick="@(() => LoadUser(user))">
+                            User workdays
+                        </MudButton>
+                    </MudCardContent>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+}
+else
+{
+    @if (_selectedUser.SelectedMonth != null)
     {
-        <MudItem xs="4">
-        <MudPaper>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">@user.User.Email</MudText>
-                        @foreach(var userRole in user.UserRoles)
-                        {
-                            <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@userRole</MudText>
-                        }
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudButton Variant="Variant.Filled"
-                               EndIcon="@Icons.Material.Filled.CalendarMonth"
-                               Color="Color.Primary">
-                        User workdays
-                    </MudButton>
-                </MudCardContent>
-            </MudPaper>
-        </MudItem>
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.AssignmentReturn" Color="Color.Error"
+                   OnClick="@(() => _selectedUser.SelectedMonth = null)">
+            Return
+        </MudButton>
+
+        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.SelectedMonth.DateMonth.DateTime.ToShortDateString()</MudText>
+        
+        <MudTable Class="mt-4" Items="@_selectedUser.SelectedMonth.Days" Breakpoint="Breakpoint.Sm" Dense="@true"
+                  Hover="@true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">Working hours in month</MudText>
+                <MudSpacer />
+            </ToolBarContent>
+            <ColGroup>
+                <col style="width: 60px;"/>
+                <col style="width: auto;"/>
+                <col style="width: auto;"/>
+                <col style="width: 60px;"/>
+            </ColGroup>
+            <HeaderContent>
+                <MudTh>Date</MudTh>
+                <MudTh>StartHour</MudTh>
+                <MudTh>EndHour</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Date.Date.ToShortDateString()</MudTd>
+                <MudTd>
+                    @if (!(context.IsDayOff || context.IsVacation))
+                    {
+                        <MudText Typo="Typo.body1">@context.StartHour?.ToString(@"hh\:mm")</MudText>
+                    }
+                </MudTd>
+                <MudTd>
+                    @if (!(context.IsDayOff || context.IsVacation))
+                    {
+                        <MudText Typo="Typo.body1">@context.EndHour?.ToString(@"hh\:mm")</MudText>
+                    }
+                </MudTd>
+            </RowTemplate>
+            <EditButtonContent Context="button">
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction"/>
+            </EditButtonContent>
+        </MudTable>
+        
+        <div Class="d-flex justify-end flex-grow-1">
+            <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Primary">Export To PDF</MudButton>
+        </div>
     }
-</MudGrid>
+    else
+    {
+        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.AssignmentReturn" Color="Color.Error"
+                   OnClick="@(() => _selectedUser = null)">
+            Return
+        </MudButton>
+        
+        <MudGrid Class="mt-4">
+            @foreach (var month in _selectedUser.UserWorkMonths)
+            {
+                <MudItem xs="4">
+                    <MudPaper>
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">@month.DateMonth.DateTime.ToShortDateString()</MudText>
+                                <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@month.Days.Count(x => x.StartHour != null) work days</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudButton Variant="Variant.Filled"
+                                       EndIcon="@Icons.Material.Filled.CalendarMonth"
+                                       Color="Color.Primary"
+                                       OnClick="@(() => _selectedUser.SelectedMonth = month)">
+                                User workdays
+                            </MudButton>
+                        </MudCardContent>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+
+}
 
 @code {
     IEnumerable<UserViewModel> _users = new List<UserViewModel>();
+    UserMonthsViewModel? _selectedUser { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         _users = await UsersService.GetUsers();
+    }
+    
+    async Task LoadUser(UserViewModel user)
+    {
+        _selectedUser = new UserMonthsViewModel()
+        {
+            User = user,
+            UserWorkMonths = await MonthDayService.GetUserMonths(user.User.Id)
+        };
     }
 }
