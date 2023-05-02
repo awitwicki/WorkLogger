@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@using WorkLogger.Pages.ServicePages
 @inject IJSRuntime Js
 
 <PageTitle>Work-logger</PageTitle>
@@ -9,33 +10,51 @@
 
 @if (_isThemeLoaded)
 {
-    <MudLayout>
-        <MudAppBar Elevation="1">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _drawerOpen = !_drawerOpen)"/>
-            <MudText Typo="Typo.h6">Work logger</MudText>
-            <MudSpacer/>
-            <MudIconButton Icon="@ThemeBtnIcon" Color="Color.Inherit" OnClick="ToggleTheme"/>
-            <MudButton Href="/identity/account/logout"
-                       Variant="Variant.Text"
-                       StartIcon="@Icons.Material.Filled.Login"
-                       Color="Color.Inherit">
-                Logout
-            </MudButton>
-        </MudAppBar>
-
-        <MudDrawer @bind-Open="@_drawerOpen" Elevation="1">
-            <MudDrawerHeader>
-                <MudText Typo="Typo.h6">Blazor starter</MudText>
-            </MudDrawerHeader>
-            <NavMenu/>
-        </MudDrawer>
-
-        <MudMainContent Class="pt-16 px-16">
-            <MudContainer Class="mt-6">
-                @Body
-            </MudContainer>
-        </MudMainContent>
-    </MudLayout>
+    <AuthorizeView>
+        <Authorized>
+            <MudLayout>
+                <AuthorizeView Roles="@(Consts.AdminRole + ", " + Consts.ModeratorRole + ", " + Consts.UserRole)" Context="innerContext">
+                    <Authorized>
+                        <MudAppBar Elevation="1">
+                            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _drawerOpen = !_drawerOpen)"/>
+                            <MudText Typo="Typo.h6">Work logger</MudText>
+                            <MudSpacer/>
+                            <MudIconButton Icon="@ThemeBtnIcon" Color="Color.Inherit" OnClick="ToggleTheme"/>
+                            <MudButton Href="/identity/account/logout"
+                                       Variant="Variant.Text"
+                                       StartIcon="@Icons.Material.Filled.Login"
+                                       Color="Color.Inherit">
+                                Logout
+                            </MudButton>
+                        </MudAppBar>
+                        
+                        <MudDrawer @bind-Open="@_drawerOpen" Elevation="1">
+                            <MudDrawerHeader>
+                                <MudText Typo="Typo.h6">Blazor starter</MudText>
+                            </MudDrawerHeader>
+                            <NavMenu/>
+                        </MudDrawer>
+                        
+                        <MudMainContent Class="pt-16 px-16">
+                            <MudContainer Class="mt-6">
+                                @Body
+                            </MudContainer>
+                        </MudMainContent>
+                    </Authorized>
+                    <NotAuthorized>
+                        <MudMainContent>
+                            <MudContainer>
+                                <MudText Typo="Typo.h4">Contact to the admin</MudText>
+                            </MudContainer>
+                        </MudMainContent>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </MudLayout>
+        </Authorized>
+        <NotAuthorized>
+            <RedirectToLogin/>
+        </NotAuthorized>
+    </AuthorizeView>
 }
 
 @code {

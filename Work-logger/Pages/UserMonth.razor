@@ -96,6 +96,13 @@ else
             Return
         </MudButton>
         
+        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.User.User.UserName @_selectedUser.User.User.Email</MudText>
+        
+        @if (!_selectedUser.UserWorkMonths.Any())
+        {
+            <MudText Class="mt-4" Typo="Typo.h4">User hasn't provided any data yet :(</MudText>
+        }
+        
         <MudGrid Class="mt-4">
             @foreach (var month in _selectedUser.UserWorkMonths)
             {
