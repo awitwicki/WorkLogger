@@ -107,7 +107,7 @@ public class WorkingTimeRecordsDocument : IDocument
                     static IContainer CellStyleWeekend(IContainer container)
                     {
                         return container
-                            .Background("#8BACB7FF")
+                            .Background("#b3ceff")
                             .Element(CellStyle);
                     }
                 }
