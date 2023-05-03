@@ -3,8 +3,14 @@
 @using WorkLogger.Domain.ViewModels
 @using WorkLogger.Domain.Services
 @using System.Security.Claims
+@using WorkLogger.Services.Services
+
+@inject IJSRuntime js
 @inject ISnackbar Snackbar
 @inject IMonthDayService MonthDayService
+@inject IPdfService PdfService
+
+<MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="BuildPdf">Generate Pdf</MudButton>
 
 <MudTable Items="@_workDays" Loading="@(_workDays == null)" Breakpoint="Breakpoint.Sm" Dense="@true" Hover="@true"
           OnCommitEditClick="@(() => Snackbar.Add("Saved"))" IsEditRowSwitchingBlocked="@true"
@@ -62,7 +68,8 @@
     </EditButtonContent>
 </MudTable>
 
-<div Class="d-flex justify-end flex-grow-1">
+<div Class="d-flex justify-space-between flex-grow-1">
+    <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="BuildPdf">Generate Pdf</MudButton>
     <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
 </div>
 
@@ -82,13 +89,29 @@
         // Get user Id
         _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         
-        _workDays = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
+        _workDays = await MonthDayService.GetMonthDays(DateTimeOffset.UtcNow, _userId);
     }
     
     private async Task Save()
     {
         await MonthDayService.SaveMonth(_workDays!, DateTimeOffset.UtcNow, _userId);
 
+        Snackbar.Add("Month working hours saved");
+    }
+    
+    private async Task BuildPdf()
+    {
+        var month = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
+        
+        var pdfBytes = PdfService.GeneratePdfAsync(month);
+        
+        // Start download
+        var fileName = $"Month_{DateTimeOffset.UtcNow.Month}_{DateTimeOffset.UtcNow.Year}.pdf";
+        
+        var pdfBase64 = Convert.ToBase64String(pdfBytes);
+        
+        await js.InvokeVoidAsync("jsSaveAsFile", fileName, pdfBase64);
+        
         Snackbar.Add("Month working hours saved");
     }
 }

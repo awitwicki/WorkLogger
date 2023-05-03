@@ -11,4 +11,8 @@
       <ProjectReference Include="..\WorkLogger.Infrastructure\WorkLogger.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="QuestPDF" Version="2022.12.5" />
+    </ItemGroup>
+
 </Project>

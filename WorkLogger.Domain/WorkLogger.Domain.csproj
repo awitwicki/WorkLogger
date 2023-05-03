@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="12.0.1" />
       <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.5" />
+      <PackageReference Include="QuestPDF" Version="2022.12.5" />
     </ItemGroup>
 
 </Project>

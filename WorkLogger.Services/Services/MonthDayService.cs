@@ -39,7 +39,7 @@ public class MonthDayService : IMonthDayService
         return ValueTask.FromResult((IEnumerable<MonthDayFormItem>)month);
     }
 
-    public async ValueTask<IEnumerable<MonthDayFormItem>> GetMonth(DateTimeOffset date, string userId)
+    public async ValueTask<IEnumerable<MonthDayFormItem>> GetMonthDays(DateTimeOffset date, string userId)
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
@@ -69,6 +69,18 @@ public class MonthDayService : IMonthDayService
         }
 
         return monthDays;
+    }
+
+    public Task<MonthWorkDay> GetMonth(DateTimeOffset date, string userId)
+    {
+        // Truncate date to month
+        date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
+        
+        return _context.MonthWorkDays.AsNoTracking()
+                .Where(x => x.DateMonth == date)
+                .Where(x => x.EmployeeId == userId)
+                .Include(x => x.Employee)
+                .FirstOrDefaultAsync();
     }
 
     public async Task SaveMonth(IEnumerable<MonthDayFormItem> days, DateTimeOffset date, string userId)
