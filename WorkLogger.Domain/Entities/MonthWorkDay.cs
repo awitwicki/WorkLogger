@@ -8,7 +8,6 @@ public class MonthWorkDay
 
     public string EmployeeId { get; set; }
     public IdentityUser Employee { get; set; }
-
     public DateTimeOffset DateMonth { get; set; }
     public IEnumerable<MonthWorkDayItem> Days { get; set; }
 }

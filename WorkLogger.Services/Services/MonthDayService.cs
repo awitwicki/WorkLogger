@@ -20,7 +20,10 @@ public class MonthDayService : IMonthDayService
     
     public ValueTask<IEnumerable<MonthDayFormItem>> BuildMonth(DateTimeOffset date)
     {
+        // Truncate date to month
+        date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
         var days = DateTime.DaysInMonth(date.Year, date.Month);
+        
         var month = new List<MonthDayFormItem>();
         for (var i = 1; i <= days; i++)
         {
@@ -43,32 +46,20 @@ public class MonthDayService : IMonthDayService
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
-        
+
         IEnumerable<MonthDayFormItem> monthDays;
 
-        try
+        var month = await _context.MonthWorkDays.AsNoTracking()
+            .Where(x => x.DateMonth == date)
+            .Where(x => x.EmployeeId == userId)
+            .FirstOrDefaultAsync();
+
+        if (month != null)
         {
-            var month = await _context.MonthWorkDays.AsNoTracking()
-                .Where(x => x.DateMonth == date)
-                .Where(x => x.EmployeeId == userId)
-                .FirstOrDefaultAsync();
-            
-            if (month == null)
-            {
-                monthDays = BuildMonth(date).Result;
-            }
-            else
-            {
-                monthDays = _mapper.Map<IEnumerable<MonthDayFormItem>>(month.Days);
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
+            return _mapper.Map<IEnumerable<MonthDayFormItem>>(month.Days);
         }
 
-        return monthDays;
+        return null;
     }
 
     public Task<MonthWorkDay> GetMonth(DateTimeOffset date, string userId)
@@ -108,7 +99,7 @@ public class MonthDayService : IMonthDayService
             {
                 DateMonth = date,
                 EmployeeId = userId,
-                Days = _mapper.Map<List<MonthWorkDayItem>>(days),
+                Days = _mapper.Map<List<MonthWorkDayItem>>(days)
             };
             
             _context.MonthWorkDays.Add(month);
@@ -116,14 +107,15 @@ public class MonthDayService : IMonthDayService
         
         await _context.SaveChangesAsync();
         
-        // TODO deattach entity
+        _context.Entry(month).State = EntityState.Detached;
     }
 
     public ValueTask<IEnumerable<MonthWorkDay>> GetUserMonths(string userId)
     {
         var months = _context.MonthWorkDays.AsNoTracking()
             .Where(x => x.EmployeeId == userId)
-            .OrderByDescending(x => x.DateMonth);
+            .Include(x => x.Employee)
+            .OrderBy(x => x.DateMonth);
 
         return ValueTask.FromResult(months.AsEnumerable());
     }

@@ -4,5 +4,5 @@ namespace WorkLogger.Services.Services;
 
 public interface IPdfService
 {
-    byte[] GeneratePdfAsync(MonthWorkDay model);
+    byte[] GeneratePdf(MonthWorkDay model);
 }

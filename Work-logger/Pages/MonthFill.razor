@@ -10,70 +10,79 @@
 @inject IMonthDayService MonthDayService
 @inject IPdfService PdfService
 
-<MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="BuildPdf">Generate Pdf</MudButton>
-
-<MudTable Items="@_workDays" Loading="@(_workDays == null)" Breakpoint="Breakpoint.Sm" Dense="@true" Hover="@true"
-          OnCommitEditClick="@(() => Snackbar.Add("Saved"))" IsEditRowSwitchingBlocked="@true"
-          EditTrigger="TableEditTrigger.EditButton">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Working hours in month</MudText>
-        <MudSpacer />
-    </ToolBarContent>
-    <ColGroup>
+@if (_workDays == null)
+{
+    <MudDatePicker Class="my-2" @bind-Date="_selectedMonth" Label="Select month" Variant="Variant.Outlined"/>
+    <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="GenerateMonth">Open or create new month record</MudButton>
+}
+else
+{
+    <MudTable Items="@_workDays" Loading="@(_workDays == null)" Breakpoint="Breakpoint.Sm" Dense="@true" Hover="@true"
+              OnCommitEditClick="@(() => Snackbar.Add("Saved"))" IsEditRowSwitchingBlocked="@true"
+              EditTrigger="TableEditTrigger.EditButton">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Working hours in month @GetNowMonthString()</MudText>
+            <MudSpacer/>
+            <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => _workDays = null)">Discard</MudButton>
+        </ToolBarContent>
+        <ColGroup>
             <col style="width: 60px;"/>
             <col style="width: auto;"/>
             <col style="width: auto;"/>
             <col style="width: 60px;"/>
         </ColGroup>
-    <HeaderContent>
-        <MudTh>Date</MudTh>
-        <MudTh>StartHour</MudTh>
-        <MudTh>EndHour</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>@context.Date.Date.ToShortDateString()</MudTd>
-        <MudTd>
-            @if (!context.IsDisabled)
-            {
-                <MudText Typo="Typo.body1">@context.StartHour?.ToString(@"hh\:mm")</MudText>
-            }
-        </MudTd>
-        <MudTd>
-            @if (!context.IsDisabled)
-            {
-                <MudText Typo="Typo.body1">@context.EndHour?.ToString(@"hh\:mm")</MudText>
-            }
-        </MudTd>
-    </RowTemplate>
-    <RowEditingTemplate>
-        <MudTd>@context.Date.Date.ToShortDateString()
-            @if (!context.IsDayOff)
-            {
-                <MudCheckBox Label="Vacation" @bind-Checked="@context.IsVacation" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
-            }
-            @if (!context.IsVacation)
-            {
-                <MudCheckBox Label="Holiday" @bind-Checked="@context.IsDayOff" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
-            }
-        </MudTd>
-        <MudTd>
-            <MudTimePicker Label="StartHour" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.StartHour" Disabled="@context.IsDisabled"/>
-        </MudTd>
-        <MudTd>
-            <MudTimePicker Label="EndHour" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.EndHour" Disabled="@context.IsDisabled"/>
-        </MudTd>
-    </RowEditingTemplate>
-    <EditButtonContent Context="button">
-           <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction"/>
-    </EditButtonContent>
-</MudTable>
+        <HeaderContent>
+            <MudTh>Date</MudTh>
+            <MudTh>StartHour</MudTh>
+            <MudTh>EndHour</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Date.Date.ToShortDateString()</MudTd>
+            <MudTd>
+                @if (!context.IsDisabled)
+                {
+                    <MudText Typo="Typo.body1">@context.StartHour?.ToString(@"hh\:mm")</MudText>
+                }
+            </MudTd>
+            <MudTd>
+                @if (!context.IsDisabled)
+                {
+                    <MudText Typo="Typo.body1">@context.EndHour?.ToString(@"hh\:mm")</MudText>
+                }
+            </MudTd>
+        </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd>@context.Date.Date.ToShortDateString()
+                @if (!context.IsDayOff)
+                {
+                    <MudCheckBox Label="Vacation" @bind-Checked="@context.IsVacation" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
+                }
+                @if (!context.IsVacation)
+                {
+                    <MudCheckBox Label="Holiday" @bind-Checked="@context.IsDayOff" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
+                }
+            </MudTd>
+            <MudTd>
+                <MudTimePicker Label="StartHour" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.StartHour" Disabled="@context.IsDisabled"/>
+            </MudTd>
+            <MudTd>
+                <MudTimePicker Label="EndHour" Editable="true" TimeEditMode="TimeEditMode.OnlyHours" @bind-Time="context.EndHour" Disabled="@context.IsDisabled"/>
+            </MudTd>
+        </RowEditingTemplate>
+        <EditButtonContent Context="button">
+            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction"/>
+        </EditButtonContent>
+    </MudTable>
 
-<div Class="d-flex justify-space-between flex-grow-1">
-    <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="BuildPdf">Generate Pdf</MudButton>
-    <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
-</div>
+    <div Class="d-flex justify-space-between flex-grow-1">
+        <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="BuildPdf">Generate Pdf</MudButton>
+        <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
+    </div>
+}
 
 @code {
+    
+    private DateTime? _selectedMonth { get; set; }
     private IEnumerable<MonthDayFormItem>? _workDays;
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
@@ -84,17 +93,24 @@
     {
         _user = (await AuthStat).User;
         
+        _selectedMonth = GetNowMonthTruncated();
+        
         // TODO:
         // Refactor to single method
         // Get user Id
         _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         
         _workDays = await MonthDayService.GetMonthDays(DateTimeOffset.UtcNow, _userId);
+        
+        if (_workDays != null)
+        {
+            _selectedMonth = GetNowMonthTruncated();
+        }
     }
     
     private async Task Save()
     {
-        await MonthDayService.SaveMonth(_workDays!, DateTimeOffset.UtcNow, _userId);
+        await MonthDayService.SaveMonth(_workDays!, _selectedMonth.Value, _userId);
 
         Snackbar.Add("Month working hours saved");
     }
@@ -103,7 +119,7 @@
     {
         var month = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
         
-        var pdfBytes = PdfService.GeneratePdfAsync(month);
+        var pdfBytes = PdfService.GeneratePdf(month);
         
         // Start download
         var fileName = $"Month_{DateTimeOffset.UtcNow.Month}_{DateTimeOffset.UtcNow.Year}.pdf";
@@ -113,5 +129,26 @@
         await js.InvokeVoidAsync("jsSaveAsFile", fileName, pdfBase64);
         
         Snackbar.Add("Month working hours saved");
+    }
+
+    private async Task GenerateMonth()
+    {
+        _workDays = await MonthDayService.BuildMonth(new DateTimeOffset(_selectedMonth.Value, TimeSpan.Zero));
+    }
+
+    private DateTime GetNowMonthTruncated()
+    {
+        var date = DateTime.UtcNow;
+        date = new DateTime(date.Year, date.Month, 1, 0, 0, 0);
+        
+        return date;
+    }
+    
+    private string GetNowMonthString()
+    {
+        var date = DateTimeOffset.UtcNow;
+        date = new DateTime(date.Year, date.Month, 1, 0, 0, 0);
+        
+        return date.ToString("MM.yyyy");
     }
 }

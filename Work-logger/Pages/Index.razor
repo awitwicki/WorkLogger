@@ -50,6 +50,7 @@ else
     private MonthWorkDay? _monthWorkDay;
     private IEnumerable<MonthWorkDay> _months;
     private EmployeeSettings? _settings;
+    private long? _settingsId;
     
     private string _fullName { get; set; }
     private DateTime? _contractStartedDate { get; set; }
@@ -73,6 +74,7 @@ else
         {
             _fullName = _settings.FullName;
             _contractStartedDate = _settings.ContractStartedDate.Date;
+            _settingsId = _settings.Id;
         }
         
         _monthWorkDay = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
@@ -85,6 +87,7 @@ else
         {
             var _employeeSettings = new EmployeeSettings
             {
+                Id = _settingsId ?? 0,
                 EmployeeId = _userId,
                 FullName = _fullName,
                 ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero)

@@ -23,6 +23,9 @@ public class EmployeeSettingsService : IEmployeeSettingsService
     {
         _dbContext.EmployeeSettings.Update(employeeSettings);
         
+        var user = await _dbContext.Users.FirstAsync(x => x.Id == employeeSettings.EmployeeId);
+        user.UserName = employeeSettings.FullName;
+        
         await _dbContext.SaveChangesAsync();
 
         _dbContext.Entry(employeeSettings).State = EntityState.Detached;
