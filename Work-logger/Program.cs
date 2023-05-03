@@ -36,6 +36,7 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IEmployeeSettingsService, EmployeeSettingsService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 
 builder.Services.AddSingleton<WeatherForecastService>();

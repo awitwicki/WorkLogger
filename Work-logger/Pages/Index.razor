@@ -1,35 +1,104 @@
 ﻿@page "/"
+@using WorkLogger.Services.Services
+@using WorkLogger.Domain.Entities
+@using System.Security.Claims
+@using WorkLogger.Domain.Services
+@using WorkLogger.Pages.Shared
 
-<PageTitle>Index</PageTitle>
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject IEmployeeSettingsService EmployeeSettingsService
+@inject IMonthDayService MonthDayService
 
-<MudText Typo="Typo.h4">Hello, world!</MudText>
+@if (_settings == null)
+{
+    <MudText Typo="Typo.h6">Please provide additional information:</MudText>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudPaper Class="pa-4">
+                <MudTextField @bind-Value="_fullName" Label="Full Name" Variant="Variant.Outlined"/>
+                <MudDatePicker Class="my-2" @bind-Date="_contractStartedDate" Label="Contract started date"  Variant="Variant.Outlined"/>
+                <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSettings">Save</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudText Typo="Typo.h6">@_settings?.FullName</MudText>
+    <MudText Typo="Typo.h6">Contract started date @_settings?.ContractStartedDate.Date.ToShortDateString()</MudText>
+    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+               OnClick="@(() => _settings = null)">
+        Edit info
+    </MudButton>
+    
+    <MudGrid>
+        <MudItem md="4" xs="12">
+            @foreach(var month in _months.TakeLast(5))
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Class="my-2">@month.DateMonth.Date.ToString("MM.yyyy")</MudAlert>
+            }
+            @if (_monthWorkDay == null)
+            {
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="my-2">Please fill current month</MudAlert>
+            }
+        </MudItem>
+    </MudGrid>
+}
 
-<MudContainer Class="mt-6">
-    <MudAlert Severity="Severity.Success" Class="mt-16">Welcome to your new app.</MudAlert>
-</MudContainer>
+@code {
+    private MonthWorkDay? _monthWorkDay;
+    private IEnumerable<MonthWorkDay> _months;
+    private EmployeeSettings? _settings;
+    
+    private string _fullName { get; set; }
+    private DateTime? _contractStartedDate { get; set; }
+    
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+    ClaimsPrincipal _user;
+    string _userId = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        _user = (await AuthStat).User;
+        
+        // TODO:
+        // Refactor to single method
+        // Get user Id
+        _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        
+        _settings = await EmployeeSettingsService.GetEmployeeSettings(_userId);
 
-<MudText Typo="Typo.h6">How is Blazor working for you?</MudText>
-
-<AuthorizeView>
-    <Authorized>
-        This content is displayed only if the user is Authorized
-
-        @if (@context.User.IsInRole(Consts.AdminRole))
+        if (_settings != null)
         {
-           <h1>You have <b>Admin</b> role</h1>
+            _fullName = _settings.FullName;
+            _contractStartedDate = _settings.ContractStartedDate.Date;
         }
+        
+        _monthWorkDay = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
+        _months = await MonthDayService.GetUserMonths(_userId);
+    }
+    
+    private async Task SaveSettings()
+    {
+        if (_contractStartedDate.HasValue && !string.IsNullOrEmpty(_fullName))
+        {
+            var _employeeSettings = new EmployeeSettings
+            {
+                EmployeeId = _userId,
+                FullName = _fullName,
+                ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero)
+            };
 
-    </Authorized>
-    <NotAuthorized>
-        This content is displayed if the user is Not Authorized
-    </NotAuthorized>
-</AuthorizeView>
-
-<AuthorizeView>
-    <Authorized>
-        <NavLink class="nav-link" href="/identity/account/logout" Match="NavLinkMatch.All">
-            <span class="oi oi-power-standby" aria-hidden="true"></span> Logout 
-        </NavLink>
-    </Authorized>
-</AuthorizeView>
+            await EmployeeSettingsService.SaveOrUpdateEmployeeSettings(_employeeSettings);
+            
+            _settings = _employeeSettings;
+            
+            Snackbar.Add("Settings saved");
+        }
+        else
+        {
+            DialogService.Show<InfoDialog>("Please Fill all fields");
+        }
+    }
+}

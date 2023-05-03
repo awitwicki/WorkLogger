@@ -9,6 +9,7 @@ namespace WorkLogger.Infrastructure.Database
     public class ApplicationDbContext : IdentityDbContext
     {
         public DbSet<MonthWorkDay> MonthWorkDays { get; set; }
+        public DbSet<EmployeeSettings> EmployeeSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
