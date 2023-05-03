@@ -37,7 +37,7 @@ else
             <MudTh>EndHour</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Date.Date.ToShortDateString()</MudTd>
+            <MudTd>@context.Date.Date.ToString("dd.MM.yy")</MudTd>
             <MudTd>
                 @if (!context.IsDisabled)
                 {
