@@ -22,9 +22,10 @@ public class WorkingTimeRecordsDocument : IDocument
         container
             .Page(page =>
             {
+                page.DefaultTextStyle(x => x.FontFamily(Fonts.Arial));
                 page.MarginVertical(20);
                 page.MarginHorizontal(40);
-            
+
                 page.Header().Element(ComposeHeader);
                 page.Content().Element(ComposeContent);
                 page.Footer().Element(ComposeFooter);
