@@ -37,7 +37,13 @@ else
             <MudTh>EndHour</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Date.Date.ToString("dd.MM.yy")</MudTd>
+            <MudTd>
+                @context.Date.Date.ToString("dd.MM.yy")
+                @if (context.Holiday != null)
+                {
+                    <MudText Typo="Typo.body1" Color="@Color.Secondary">@context.Holiday.Name</MudText>
+                }
+            </MudTd>
             <MudTd>
                 @if (!context.IsDisabled)
                 {

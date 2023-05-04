@@ -4,7 +4,7 @@ namespace WorkLogger.Services.Services;
 
 public interface IHolidayService
 {
-    Task<List<Holiday>> GetHolidays();
+    Task<List<Holiday>> GetHolidays(DateTimeOffset? dateFrom = null, DateTimeOffset? dateTo = null);
     Task AddHoliday(DateOnly date, string name);
     Task<bool> RemoveHoliday(DateOnly date);
 }

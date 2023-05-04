@@ -4,6 +4,6 @@
     
     <AuthorizeView Roles="@(Consts.AdminRole + ", " + Consts.ModeratorRole)">
         <MudNavLink Href="/user-month" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DataExploration">Users work days</MudNavLink>
+        <MudNavLink Href="/holidays" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.HolidayVillage">Holidays</MudNavLink>
     </AuthorizeView>
-    <MudNavLink Href="/holidays" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.HolidayVillage">Holidays</MudNavLink>
 </MudNavMenu>

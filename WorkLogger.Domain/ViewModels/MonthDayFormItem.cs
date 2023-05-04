@@ -1,4 +1,6 @@
-﻿namespace WorkLogger.Domain.ViewModels;
+﻿using WorkLogger.Domain.Entities;
+
+namespace WorkLogger.Domain.ViewModels;
 
 public class MonthDayFormItem
 {
@@ -7,5 +9,6 @@ public class MonthDayFormItem
     public TimeSpan? EndHour { get; set; }
     public bool IsVacation { get; set; }
     public bool IsDayOff { get; set; }
+    public Holiday? Holiday { get; set; }
     public bool IsDisabled => IsVacation || IsDayOff;
 }

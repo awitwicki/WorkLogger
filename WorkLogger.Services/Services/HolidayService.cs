@@ -13,10 +13,22 @@ public class HolidayService : IHolidayService
     {
         _dbContext = dbContext;
     }
-    
-    public Task<List<Holiday>> GetHolidays()
+
+    public Task<List<Holiday>> GetHolidays(DateTimeOffset? dateFrom = null, DateTimeOffset? dateTo = null)
     {
-        return _dbContext.Holidays.AsNoTracking().ToListAsync();
+        var query = _dbContext.Holidays.AsNoTracking();
+
+        if (dateFrom.HasValue)
+        {
+            query = query.Where(x => x.DateDay >= dateFrom);
+        }
+
+        if (dateTo.HasValue)
+        {
+            query = query.Where(x => x.DateDay <= dateTo);
+        }
+
+        return query.OrderBy(x => x.DateDay).ToListAsync();
     }
 
     public async Task AddHoliday(DateOnly date, string name)
