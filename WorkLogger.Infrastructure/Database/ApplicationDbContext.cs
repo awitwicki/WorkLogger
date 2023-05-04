@@ -10,6 +10,7 @@ namespace WorkLogger.Infrastructure.Database
     {
         public DbSet<MonthWorkDay> MonthWorkDays { get; set; }
         public DbSet<EmployeeSettings> EmployeeSettings { get; set; }
+        public DbSet<Holiday> Holidays { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +26,10 @@ namespace WorkLogger.Infrastructure.Database
             modelBuilder
                 .Entity<IdentityUser>()
                 .HasKey(x => x.Id);
+
+            modelBuilder
+                .Entity<Holiday>()
+                .HasKey(x => x.DateDay);
         }
         
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)

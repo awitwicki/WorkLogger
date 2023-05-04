@@ -31,6 +31,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\WorkLogger.Common\WorkLogger.Common.csproj" />
 	  <ProjectReference Include="..\WorkLogger.Domain\WorkLogger.Domain.csproj" />
 	  <ProjectReference Include="..\WorkLogger.Infrastructure\WorkLogger.Infrastructure.csproj" />
 	  <ProjectReference Include="..\WorkLogger.Services\WorkLogger.Services.csproj" />

@@ -38,6 +38,7 @@ builder.Services.AddScoped<IMonthDayService, MonthDayService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IEmployeeSettingsService, EmployeeSettingsService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IHolidayService, HolidayService>();
 
 builder.Services.AddSingleton<WeatherForecastService>();
 
