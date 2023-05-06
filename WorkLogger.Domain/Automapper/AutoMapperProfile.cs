@@ -8,7 +8,9 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
-        CreateMap<MonthWorkDayItem, MonthDayFormItem>();
-        CreateMap<MonthDayFormItem, MonthWorkDayItem>();
+        CreateMap<MonthWorkDayItem, WorkDayViewModel>()
+            .ForMember(x => x.Holiday, opt => opt.Ignore());
+        CreateMap<WorkDayViewModel, MonthWorkDayItem>();
+        CreateMap<MonthWorkDay, UserWorkMonthViewModel>();
     }
 }

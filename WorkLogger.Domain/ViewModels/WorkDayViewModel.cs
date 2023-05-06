@@ -2,7 +2,7 @@
 
 namespace WorkLogger.Domain.ViewModels;
 
-public class MonthDayFormItem
+public class WorkDayViewModel
 {
     public DateTimeOffset Date { get; set; }
     public TimeSpan? StartHour { get; set; }

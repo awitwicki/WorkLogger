@@ -2,15 +2,15 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using WorkLogger.Domain.Entities;
+using WorkLogger.Domain.ViewModels;
 
 namespace WorkLogger.Domain.PdfModels;
 
 public class WorkingTimeRecordsDocument : IDocument 
 {
-    public MonthWorkDay Model { get; }
+    public UserWorkMonthViewModel Model { get; }
     
-    public WorkingTimeRecordsDocument(MonthWorkDay model)
+    public WorkingTimeRecordsDocument(UserWorkMonthViewModel model)
     {
         Model = model;
     }

@@ -89,7 +89,7 @@ else
 @code {
     
     private DateTime? _selectedMonth { get; set; }
-    private IEnumerable<MonthDayFormItem>? _workDays;
+    private IEnumerable<WorkDayViewModel>? _workDays;
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
     ClaimsPrincipal _user;
@@ -106,7 +106,7 @@ else
         // Get user Id
         _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         
-        _workDays = await MonthDayService.GetMonthDays(DateTimeOffset.UtcNow, _userId);
+        _workDays = await MonthDayService.GetDaysInMonth(DateTimeOffset.UtcNow, _userId);
         
         if (_workDays != null)
         {

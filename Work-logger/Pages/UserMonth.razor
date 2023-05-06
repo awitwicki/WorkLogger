@@ -6,7 +6,6 @@
 @using WorkLogger.Services.Services
 @using WorkLogger.Domain.Services
 @using WorkLogger.Pages.Shared
-@using WorkLogger.Domain.Entities
 
 @inject IJSRuntime js
 @inject IDialogService DialogService
@@ -88,7 +87,13 @@ else
                 <MudTh>EndHour</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd>@context.Date.Date.ToString("dd.MM.yy")</MudTd>
+                <MudTd>
+                    @context.Date.Date.ToString("dd.MM.yy")
+                    @if (context.Holiday != null)
+                    {
+                        <MudText Typo="Typo.body1" Color="@Color.Secondary">@context.Holiday.Name</MudText>
+                    }
+                </MudTd>
                 <MudTd>
                     @if (!(context.IsDayOff || context.IsVacation))
                     {
@@ -216,7 +221,7 @@ else
         }
     }
     
-    private async Task BuildPdf(MonthWorkDay month)
+    private async Task BuildPdf(UserWorkMonthViewModel month)
     {
         var pdfBytes = PdfService.GeneratePdf(month);
         

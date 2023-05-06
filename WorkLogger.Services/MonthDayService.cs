@@ -22,7 +22,7 @@ public class MonthDayService : IMonthDayService
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<MonthDayFormItem>> BuildMonth(DateTimeOffset date)
+    public async Task<IEnumerable<WorkDayViewModel>> BuildMonth(DateTimeOffset date)
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
@@ -34,13 +34,13 @@ public class MonthDayService : IMonthDayService
         var holidays = (await _holidayService.GetHolidays(dateFrom, dateTo))
             .ToImmutableDictionary(x => x.DateDay.ToDateOnly());
         
-        var month = new List<MonthDayFormItem>();
+        var month = new List<WorkDayViewModel>();
         for (var i = 1; i <= days; i++)
         {
             date = new DateTime(date.Year, date.Month, i);
             var isHoliday = holidays.TryGetValue(date.ToDateOnly(), out var holidayValue);
             
-            month.Add(new MonthDayFormItem
+            month.Add(new WorkDayViewModel
             {
                 Date = date,
                 StartHour = TimeSpan.FromHours(8),
@@ -57,39 +57,55 @@ public class MonthDayService : IMonthDayService
         return month;
     }
 
-    public async ValueTask<IEnumerable<MonthDayFormItem>> GetMonthDays(DateTimeOffset date, string userId)
+    public async Task<IEnumerable<WorkDayViewModel>> GetDaysInMonth(DateTimeOffset date, string userId)
     {
         // Truncate date to month
-        date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
+        date = date.TruncateToMonth();
 
-        IEnumerable<MonthDayFormItem> monthDays;
+        IEnumerable<WorkDayViewModel> monthDays;
 
         var month = await _context.MonthWorkDays.AsNoTracking()
             .Where(x => x.DateMonth == date)
             .Where(x => x.EmployeeId == userId)
             .FirstOrDefaultAsync();
-
+        
         if (month != null)
         {
-            return _mapper.Map<IEnumerable<MonthDayFormItem>>(month.Days);
+            var holidays = (await _holidayService.GetHolidays(date, date.AddMonths(1).AddDays(-1)))
+                .ToImmutableDictionary(x => x.DateDay.ToDateOnly());
+            
+            var workDaysViewModel  = _mapper.Map<IEnumerable<WorkDayViewModel>>(month.Days);
+            
+            // Add holidays
+            foreach (var workDayViewModel in workDaysViewModel)
+            {
+                if (holidays.TryGetValue(workDayViewModel.Date.ToDateOnly(), out var holidayValue))
+                {
+                    workDayViewModel.Holiday = holidayValue;
+                }
+            }
+
+            return workDaysViewModel;
         }
 
         return null;
     }
 
-    public Task<MonthWorkDay> GetMonth(DateTimeOffset date, string userId)
+    public async Task<UserWorkMonthViewModel> GetMonth(DateTimeOffset date, string userId)
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
         
-        return _context.MonthWorkDays.AsNoTracking()
+        var month = await _context.MonthWorkDays.AsNoTracking()
                 .Where(x => x.DateMonth == date)
                 .Where(x => x.EmployeeId == userId)
                 .Include(x => x.Employee)
                 .FirstOrDefaultAsync();
+        
+        return _mapper.Map<UserWorkMonthViewModel>(month);
     }
 
-    public async Task SaveMonth(IEnumerable<MonthDayFormItem> days, DateTimeOffset date, string userId)
+    public async Task SaveMonth(IEnumerable<WorkDayViewModel> days, DateTimeOffset date, string userId)
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
@@ -125,13 +141,31 @@ public class MonthDayService : IMonthDayService
         _context.Entry(month).State = EntityState.Detached;
     }
 
-    public ValueTask<IEnumerable<MonthWorkDay>> GetUserMonths(string userId)
+    public async Task<IEnumerable<UserWorkMonthViewModel>> GetUserMonths(string userId)
     {
-        var months = _context.MonthWorkDays.AsNoTracking()
+        var months = await _context.MonthWorkDays.AsNoTracking()
             .Where(x => x.EmployeeId == userId)
             .Include(x => x.Employee)
-            .OrderBy(x => x.DateMonth);
+            .OrderBy(x => x.DateMonth)
+            .ToListAsync();
 
-        return ValueTask.FromResult(months.AsEnumerable());
+        var monthViewModelCollection = _mapper.Map<IEnumerable<UserWorkMonthViewModel>>(months);
+
+        var holidays = (await _holidayService.GetHolidays())
+            .ToImmutableDictionary(x => x.DateDay.ToDateOnly());
+        
+        // Add holidays
+        foreach (var monthViewModel in monthViewModelCollection)
+        {
+            foreach (var day in monthViewModel.Days)
+            {
+                if (holidays.TryGetValue(day.Date.ToDateOnly(), out var holidayValue))
+                {
+                    day.Holiday = holidayValue;
+                }
+            }
+        }
+
+        return monthViewModelCollection;
     }
 }

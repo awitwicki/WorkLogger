@@ -3,6 +3,7 @@
 @using WorkLogger.Domain.Entities
 @using System.Security.Claims
 @using WorkLogger.Domain.Services
+@using WorkLogger.Domain.ViewModels
 @using WorkLogger.Pages.Shared
 
 @inject IDialogService DialogService
@@ -47,8 +48,8 @@ else
 }
 
 @code {
-    private MonthWorkDay? _monthWorkDay;
-    private IEnumerable<MonthWorkDay> _months;
+    private UserWorkMonthViewModel? _monthWorkDay;
+    private IEnumerable<UserWorkMonthViewModel> _months;
     private EmployeeSettings? _settings;
     private long? _settingsId;
     

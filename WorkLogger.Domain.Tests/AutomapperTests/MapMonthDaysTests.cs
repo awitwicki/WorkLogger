@@ -7,15 +7,15 @@ namespace WorkLogger.Domain.Tests.AutomapperProfileTests;
 
 public class MapMonthDaysTests
 {
-    IEnumerable<MonthDayFormItem> BuildMonth()
+    IEnumerable<WorkDayViewModel> BuildMonth()
     {
         var date = DateTimeOffset.Now;
         
         var days = DateTime.DaysInMonth(date.Year, date.Month);
-        var month = new List<MonthDayFormItem>();
+        var month = new List<WorkDayViewModel>();
         for (var i = 1; i <= days; i++)
         {
-            month.Add(new MonthDayFormItem
+            month.Add(new WorkDayViewModel
             {
                 Date = new DateTime(date.Year, date.Month, i),
                 StartHour = TimeSpan.FromHours(8),
@@ -33,11 +33,13 @@ public class MapMonthDaysTests
     [Fact]
     public void MapMonthWorkDayFormItemToMonthDayItem_WithValidData_IsValid()
     {
+        
+        
         var config = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
         
         var mapper = new Mapper(config);
 
-        var monthWorkDayFormItem = new MonthDayFormItem
+        var monthWorkDayFormItem = new WorkDayViewModel
         {
             Date = DateTimeOffset.Now,
             StartHour = TimeSpan.FromHours(11),
@@ -68,7 +70,7 @@ public class MapMonthDaysTests
             IsVacation = true
         };
         
-        var monthWorkDayItem = mapper.Map<MonthDayFormItem>(monthWorkDayFormItem);
+        var monthWorkDayItem = mapper.Map<WorkDayViewModel>(monthWorkDayFormItem);
         
         Assert.Equal(monthWorkDayFormItem.Date, monthWorkDayItem.Date);
         Assert.Equal(monthWorkDayFormItem.StartHour, monthWorkDayItem.StartHour);
@@ -111,7 +113,7 @@ public class MapMonthDaysTests
             }
         };
         
-        var monthWorkDayItem = mapper.Map<List<MonthDayFormItem>>(monthWorkDayFormItemsList);
+        var monthWorkDayItem = mapper.Map<List<WorkDayViewModel>>(monthWorkDayFormItemsList);
         
         Assert.Equal(monthWorkDayItem.First().Date, monthWorkDayFormItemsList.First().Date);
         Assert.Equal(monthWorkDayItem.First().StartHour, monthWorkDayFormItemsList.First().StartHour);
