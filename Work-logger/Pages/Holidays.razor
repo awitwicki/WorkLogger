@@ -5,9 +5,11 @@
 @using System.Security.Claims
 @using WorkLogger.Common.DateExtensions
 @using WorkLogger.Domain.Entities
+@using WorkLogger.Pages.Shared
 @using WorkLogger.Services.Services
 
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject IHolidayService HolidayService
 
 <MudGrid>
@@ -41,7 +43,7 @@
             <MudText Class="mt-4" Typo="Typo.h6">Add new holiday:</MudText>
             <MudDatePicker Class="my-2" @bind-Date="_selectedDate" Label="Select date" Variant="Variant.Outlined"/>
             <MudTextField @bind-Value="_holidayName" Label="Holiday name" Variant="Variant.Outlined"/>
-            <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="AddHoliday">Add holiday</MudButton>
+            <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="AddHoliday" Disabled="@(_holidays == null)">Add holiday</MudButton>
         </MudPaper>
     </MudItem>
 </MudGrid>
@@ -69,9 +71,15 @@
 
     private async Task AddHoliday()
     {
-        if (_holidays.Any(x => x.DateDay.ToDateOnly() == new DateTimeOffset(_selectedDate!.Value).ToDateOnly()))
+        if (_holidays!.Any(x => x.DateDay.ToDateOnly() == new DateTimeOffset(_selectedDate!.Value).ToDateOnly()))
         {
-            Snackbar.Add("That date already exists");
+            await DialogService.ShowAsync<InfoDialog>("That date already exists");
+            return;
+        }
+        
+        if (string.IsNullOrEmpty(_holidayName))
+        {
+            await DialogService.ShowAsync<InfoDialog>("Please Fill holiday name");
             return;
         }
         

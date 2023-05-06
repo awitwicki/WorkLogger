@@ -17,7 +17,10 @@
                     <Authorized>
                         <MudAppBar Elevation="1">
                             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _drawerOpen = !_drawerOpen)"/>
-                            <MudText Typo="Typo.h6">Work logger</MudText>
+                            @if (!_drawerOpen)
+                            {
+                                <MudText Typo="Typo.h6">Work logger</MudText>
+                            }
                             <MudSpacer/>
                             <MudIconButton Icon="@ThemeBtnIcon" Color="Color.Inherit" OnClick="ToggleTheme"/>
                             <MudButton Href="/identity/account/logout"
@@ -30,7 +33,7 @@
                         
                         <MudDrawer @bind-Open="@_drawerOpen" Elevation="1">
                             <MudDrawerHeader>
-                                <MudText Typo="Typo.h6">Blazor starter</MudText>
+                                <MudText Typo="Typo.h6">Work logger</MudText>
                             </MudDrawerHeader>
                             <NavMenu/>
                         </MudDrawer>
