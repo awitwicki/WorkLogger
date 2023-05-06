@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\WorkLogger.Domain\WorkLogger.Domain.csproj" />
+    </ItemGroup>
+
 </Project>

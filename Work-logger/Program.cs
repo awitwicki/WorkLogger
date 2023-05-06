@@ -3,6 +3,7 @@ using WorkLogger.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using WorkLogger.Common;
 using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.Services;
 using WorkLogger.Infrastructure.Database;
@@ -64,17 +65,26 @@ using (var scope = app.Services.CreateScope())
     }
 
     // Init roles
-  var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-  // Create all roles
-  foreach (var roleName in Consts.RolesList)
-  {
-      var roleExists = roleManager.FindByNameAsync(roleName).Result;
-      if (roleExists == null)
-      {
-          roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
-      }
-  }
+    // Create all roles
+    foreach (var roleName in Consts.RolesList)
+    {
+        var roleExists = roleManager.FindByNameAsync(roleName).Result;
+        if (roleExists == null)
+        {
+            roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
+        }
+    }
+    
+    // Init Holidays
+    if (!context.Holidays.Any())
+    {
+        var holidaysToAdd = HolidaysHelpers.GetHolidays2023();
+        
+        context.Holidays.AddRange(holidaysToAdd);
+        context.SaveChanges();
+    }
 }
 
 app.UseHttpsRedirection();
