@@ -22,16 +22,23 @@
                 <MudPaper>
                     <MudCardHeader>
                         <CardHeaderContent>
-                            <MudText Typo="Typo.h6">@user.User.Email</MudText>
-                            @foreach(var userRole in user.UserRoles)
+                            @if (user.EmployeeSettings == null)
                             {
-                                <MudText Class="mx-1 rounded btn-outline-danger" Typo="Typo.overline">@userRole</MudText>
+                                <MudText Class="mt-4" Color="@Color.Error" Typo="Typo.h4">Settings is empty</MudText>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.h6">@user.EmployeeSettings.FullName</MudText>
+                            }
+                            <MudText Typo="Typo.body1">@user.User.Email</MudText>
+                            @foreach (var userRole in user.UserRoles)
+                            {
+                                <MudText Class="mr-1 rounded btn-outline-danger" Typo="Typo.overline">@userRole</MudText>
                             }
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
-                        <MudButton Class="my-2"
-                                   Variant="Variant.Filled"
+                        <MudButton Variant="Variant.Filled"
                                    OnClick="@(() => AddUserRole(user.User.Id))"
                                    Color="Color.Primary">
                             Add role
@@ -124,8 +131,16 @@ else
                    OnClick="@(() => _selectedUser = null)">
             Return
         </MudButton>
-        
-        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.User.User.UserName</MudText>
+
+        if (_selectedUser.User.EmployeeSettings == null)
+        {
+            <MudText Class="mt-4" Color="@Color.Error" Typo="Typo.h4">Settings is empty</MudText>
+        }
+        else
+        {
+            <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.User.EmployeeSettings.FullName</MudText>
+        }
+        <MudText Class="mt-4" Typo="Typo.body1">@_selectedUser.User.User.Email</MudText>
         
         @if (!_selectedUser.UserWorkMonths.Any())
         {

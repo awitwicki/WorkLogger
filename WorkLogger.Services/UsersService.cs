@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WorkLogger.Domain.Entities;
 using WorkLogger.Domain.ViewModels;
 using WorkLogger.Infrastructure.Database;
 
@@ -15,25 +16,37 @@ public class UsersService : IUsersService
         _dbContext = dbContext;
         _userManager = userManager;
     }
-        
+    
     public async Task<List<UserViewModel>> GetUsers()
     {
         var queryUsersAndRoles = from usr in _dbContext.Users
             join usrRoles in _dbContext.UserRoles on usr.Id equals usrRoles.UserId
                 into groupingUserRoles
             from usrRoles in groupingUserRoles.DefaultIfEmpty()
+           
+            join settings in _dbContext.EmployeeSettings on usr.Id equals settings.EmployeeId
+                into groupingsettings
+            from settings in groupingsettings.DefaultIfEmpty()
+            
             join roles in _dbContext.Roles on usrRoles.RoleId equals roles.Id
                 into groupingRoles
             from roles in groupingRoles.DefaultIfEmpty()
-            select new { User = usr, UserRoles = roles };
+            select new { User = usr, UserRoles = roles, EmployeeSettings = settings  };
        
         var normalizedUsersViewModel = await queryUsersAndRoles.GroupBy(x => x.User.Id)
             .Select(x => new UserViewModel
             {
                 User = x.First().User,
-                UserRoles = x.Select(r => r.UserRoles.Name!).Distinct().ToList()
+                UserRoles = x.Select(r => r.UserRoles.Name!).Distinct().ToList(),
+                EmployeeSettings = x.First().EmployeeSettings
             })
             .ToListAsync();
+
+        normalizedUsersViewModel
+            .Where(x => x.EmployeeSettings != null)
+            .ToList()
+            .ForEach(x =>
+                _dbContext.Entry(x.EmployeeSettings).State = EntityState.Detached);
 
         return normalizedUsersViewModel;
     }
