@@ -99,15 +99,19 @@ else
                     {
                         <MudText Typo="Typo.body1" Color="@Color.Secondary">@context.Holiday.Name</MudText>
                     }
+                    @if (context.IsL4)
+                    {
+                        <MudText Typo="Typo.body1" Color="@Color.Secondary">L4</MudText>
+                    }
                 </MudTd>
                 <MudTd>
-                    @if (!(context.IsDayOff || context.IsVacation))
+                    @if (!(context.IsDayOff || context.IsVacation || context.IsL4))
                     {
                         <MudText Typo="Typo.body1">@context.StartHour?.ToString(@"hh\:mm")</MudText>
                     }
                 </MudTd>
                 <MudTd>
-                    @if (!(context.IsDayOff || context.IsVacation))
+                    @if (!(context.IsDayOff || context.IsVacation || context.IsL4))
                     {
                         <MudText Typo="Typo.body1">@context.EndHour?.ToString(@"hh\:mm")</MudText>
                     }

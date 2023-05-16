@@ -91,8 +91,8 @@ public class WorkingTimeRecordsDocument : IDocument
                     var isWeekend = !(day.IsVacation || day.IsDayOff);
                     
                     table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(day.Date.ToString("dd.MM"));
-                    table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(!(day.IsVacation || day.IsDayOff) ? day.StartHour?.ToString(@"hh\:mm") : "");
-                    table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(!(day.IsVacation || day.IsDayOff) ? day.EndHour?.ToString(@"hh\:mm") : "");
+                    table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(!(day.IsVacationOrL4 || day.IsDayOff) ? day.StartHour?.ToString(@"hh\:mm") : "");
+                    table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(!(day.IsVacationOrL4 || day.IsDayOff) ? day.EndHour?.ToString(@"hh\:mm") : "");
                     table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text("");
 
                     static IContainer CellStyle(IContainer container)

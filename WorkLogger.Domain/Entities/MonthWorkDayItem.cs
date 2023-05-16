@@ -7,4 +7,5 @@ public class MonthWorkDayItem
     public TimeSpan? EndHour { get; set; }
     public bool IsVacation { get; set; }
     public bool IsDayOff { get; set; }
+    public bool IsL4 { get; set; }
 }

@@ -43,6 +43,10 @@ else
                 {
                     <MudText Typo="Typo.body1" Color="@Color.Secondary">@context.Holiday.Name</MudText>
                 }
+                @if (context.IsL4)
+                {
+                    <MudText Typo="Typo.body1" Color="@Color.Secondary">L4</MudText>
+                }
             </MudTd>
             <MudTd>
                 @if (!context.IsDisabled)
@@ -59,13 +63,17 @@ else
         </RowTemplate>
         <RowEditingTemplate>
             <MudTd>@context.Date.Date.ToShortDateString()
-                @if (!context.IsDayOff)
+                @if (!context.IsDayOff && !context.IsL4)
                 {
-                    <MudCheckBox Label="Vacation" @bind-Checked="@context.IsVacation" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
+                    <MudCheckBox Label="Vacation" Class="my-2" @bind-Checked="@context.IsVacation" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
                 }
-                @if (!context.IsVacation)
+                @if (!context.IsVacation && !context.IsL4)
                 {
-                    <MudCheckBox Label="Holiday" @bind-Checked="@context.IsDayOff" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
+                    <MudCheckBox Label="Holiday" Class="my-2" @bind-Checked="@context.IsDayOff" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
+                }
+                @if (!context.IsDayOff && !context.IsVacation)
+                {
+                    <MudCheckBox Label="L4" Class="my-2" @bind-Checked="@context.IsL4" Color="Color.Primary" UnCheckedColor="Color.Default"></MudCheckBox>
                 }
             </MudTd>
             <MudTd>
