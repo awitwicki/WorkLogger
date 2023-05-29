@@ -74,7 +74,7 @@ else
             <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => BuildPdf(_selectedUser.SelectedMonth))">Export To PDF</MudButton>
         </div>
 
-        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.SelectedMonth.DateMonth.DateTime.ToString("MM.yyyy") @_selectedUser.SelectedMonth.Employee.UserName</MudText>
+        <MudText Class="mt-4" Typo="Typo.h4">@_selectedUser.SelectedMonth.DateMonth.DateTime.ToString("MM.yyyy") @_selectedUser.User.EmployeeSettings.FullName</MudText>
         
         <MudTable Class="mt-4" Items="@_selectedUser.SelectedMonth.Days" Breakpoint="Breakpoint.Sm" Dense="@true"
                   Hover="@true">

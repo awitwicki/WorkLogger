@@ -44,7 +44,7 @@ public class WorkingTimeRecordsDocument : IDocument
         
                 column.Item().Text(text =>
                 {
-                    text.Span($"{Model.Employee.UserName}").FontSize(15).SemiBold();
+                    text.Span($"{Model.EmployeeSettings.FullName}").FontSize(15).SemiBold();
                 });
             });
         });
@@ -122,7 +122,7 @@ public class WorkingTimeRecordsDocument : IDocument
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(Model.Employee.UserName);
+                    column.Item().Text(Model.EmployeeSettings.FullName);
                 });
                 
                 row.RelativeItem().Column(column =>
