@@ -3,10 +3,12 @@
 @using WorkLogger.Domain.ViewModels
 @using WorkLogger.Domain.Services
 @using System.Security.Claims
+@using WorkLogger.Pages.Shared
 @using WorkLogger.Services.Services
 
 @inject IJSRuntime js
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @inject IMonthDayService MonthDayService
 @inject IPdfService PdfService
 
@@ -128,21 +130,28 @@ else
 
         Snackbar.Add("Month working hours saved");
     }
-    
+
     private async Task BuildPdf()
     {
-        var month = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
-        
-        var pdfBytes = PdfService.GeneratePdf(month);
-        
-        // Start download
-        var fileName = $"Month_{DateTimeOffset.UtcNow.Month}_{DateTimeOffset.UtcNow.Year}.pdf";
-        
-        var pdfBase64 = Convert.ToBase64String(pdfBytes);
-        
-        await js.InvokeVoidAsync("jsSaveAsFile", fileName, pdfBase64);
-        
-        Snackbar.Add("Month working hours saved");
+        try
+        {
+            var month = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
+
+            var pdfBytes = PdfService.GeneratePdf(month);
+
+            // Start download
+            var fileName = $"Month_{DateTimeOffset.UtcNow.Month}_{DateTimeOffset.UtcNow.Year}.pdf";
+
+            var pdfBase64 = Convert.ToBase64String(pdfBytes);
+
+            await js.InvokeVoidAsync("jsSaveAsFile", fileName, pdfBase64);
+
+            Snackbar.Add("Month working hours saved");
+        }
+        catch (Exception e)
+        {
+            await DialogService.ShowAsync<InfoDialog>(e.ToString());
+        }
     }
 
     private async Task GenerateMonth()
