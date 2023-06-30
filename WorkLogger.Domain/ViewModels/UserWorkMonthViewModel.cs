@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using WorkLogger.Domain.Entities;
+﻿using WorkLogger.Domain.Entities;
 
 namespace WorkLogger.Domain.ViewModels;
 

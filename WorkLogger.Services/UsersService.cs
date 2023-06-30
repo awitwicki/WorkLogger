@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using WorkLogger.Domain.Entities;
 using WorkLogger.Domain.ViewModels;
 using WorkLogger.Infrastructure.Database;
 
