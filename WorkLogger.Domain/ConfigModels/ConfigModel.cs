@@ -24,7 +24,7 @@ public class ConfigModel
     
     public ConfigModel()
     {
-        SmtpHost = Environment.GetEnvironmentVariable("SmtpServer")!;
+        SmtpHost = Environment.GetEnvironmentVariable("SmtpHost")!;
         var smtpPortStr = Environment.GetEnvironmentVariable("SmtpPort");
         SmtpUsername = Environment.GetEnvironmentVariable("SmtpUsername")!;
         SmtpPassword = Environment.GetEnvironmentVariable("SmtpPassword")!;
