@@ -26,6 +26,9 @@
             <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Login</button>
         </div>
         <div class="form-help-links mt-2 d-flex flex-column justify-end">
+            <a asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot password</a>
+        </div>
+        <div class="form-help-links mt-2 d-flex flex-column justify-end">
             <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
         </div>
     </form>

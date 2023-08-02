@@ -1,12 +1,15 @@
 using WorkLogger;
 using WorkLogger.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using WorkLogger.Common;
 using WorkLogger.Domain.Automapper;
+using WorkLogger.Domain.ConfigModels;
 using WorkLogger.Domain.Services;
 using WorkLogger.Infrastructure.Database;
+using WorkLogger.Services;
 using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +37,20 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+var config = new ConfigModel();
+if (config.HasErrors)
+{
+    foreach (var errorMessage in config.ErrorMessages)
+    {
+        Console.WriteLine(errorMessage);
+    }
+
+    await Task.Delay(-1);
+}
+
+builder.Services.AddSingleton<ConfigModel>(x => config);
+builder.Services.AddScoped<IEmailSender>(x => new EmailSender(x.GetRequiredService<ConfigModel>()));
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
