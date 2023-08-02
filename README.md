@@ -8,8 +8,9 @@
 
 ## How to run
 
-1. Create `.env` file and fill with necessary params where `xxxxxxxxxx` is your secret.:
+1. Create `.env` file and fill with necessary params (where `xxxxxxxxxx` is your secret and database is PostgreSQL):
     ```
+        DB_CONNECTION_STRING=xxxxxxxxxx
         SmtpHost=xxxxxxxxxx
         SmtpPort=xxxxxxxxxx
         SmtpUsername=xxxxxxxxxx
