@@ -110,7 +110,11 @@ public class MonthDayService : IMonthDayService
             throw new Exception("Employee settings is not defined");
         
         var userWorkMonthDto = _mapper.Map<UserWorkMonthViewModel>(month);
-        userWorkMonthDto.EmployeeSettings = employeeSettings;
+
+        if (userWorkMonthDto != null)
+        {
+            userWorkMonthDto.EmployeeSettings = employeeSettings;
+        }
         
         return userWorkMonthDto;
     }
