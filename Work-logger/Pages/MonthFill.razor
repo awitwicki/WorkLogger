@@ -32,6 +32,7 @@ else
             <col style="width: auto;"/>
             <col style="width: auto;"/>
             <col style="width: 60px;"/>
+            <col style="width: 60px;"/>
         </ColGroup>
         <HeaderContent>
             <MudTh>Date</MudTh>
@@ -40,7 +41,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                @context.Date.Date.ToString("dd.MM.yy")
+                <MudText Typo="Typo.body1">@context.Date.Date.ToString("dd.MM.yy")</MudText>
                 @if (context.Holiday != null)
                 {
                     <MudText Typo="Typo.body1" Color="@Color.Secondary">@context.Holiday.Name</MudText>
@@ -65,6 +66,9 @@ else
                 {
                     <MudText Typo="Typo.body1">@context.EndHour?.ToString(@"hh\:mm")</MudText>
                 }
+            </MudTd>
+            <MudTd>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.HolidayVillage" Class="pa-0" OnClick="@(() => ToggleVacation(context))"/>
             </MudTd>
         </RowTemplate>
         <RowEditingTemplate>
@@ -135,6 +139,22 @@ else
         Snackbar.Add("Month working hours saved");
     }
 
+    private void ToggleVacation(WorkDayViewModel model)
+    {
+        if (!model.IsVacation)
+        {
+            model.IsVacation = true;
+            model.IsL4 = false;
+            model.IsDayOff = false;
+        }
+        else
+        {
+            model.IsVacation = false;
+        }
+        
+        StateHasChanged();
+    }
+    
     private async Task BuildPdf()
     {
         try
