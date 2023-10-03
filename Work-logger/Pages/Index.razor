@@ -39,7 +39,9 @@ else
             <MudText Typo="Typo.h6">User months</MudText>
             @foreach (var month in _months.TakeLast(5))
             {
-                <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Class="my-2">@month.DateMonth.Date.ToString("MM.yyyy")</MudAlert>
+                <MudLink Href=@($"/month/{month.DateMonth.ToString("yyyy.MM")}")>
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Class="my-2">@month.DateMonth.Date.ToString("MM.yyyy")</MudAlert>
+                </MudLink>
             }
             <MudLink Href="/month">
                 <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="my-2">Fill new month</MudAlert>
