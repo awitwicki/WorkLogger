@@ -41,12 +41,9 @@ else
             {
                 <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Class="my-2">@month.DateMonth.Date.ToString("MM.yyyy")</MudAlert>
             }
-            @if (_monthWorkDay == null)
-            {
-                <MudLink Href="/month">
-                    <MudAlert Severity="Severity.Warning" Variant="Variant.Filled" Class="my-2">Please fill current month</MudAlert>
-                </MudLink>
-            }
+            <MudLink Href="/month">
+                <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="my-2">Fill new month</MudAlert>
+            </MudLink>
         </MudItem>
         <MudItem md="4" xs="12">
             @if (_monthWorkDay == null)

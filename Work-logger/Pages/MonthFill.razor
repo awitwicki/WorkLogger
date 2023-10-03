@@ -23,7 +23,7 @@ else
               OnCommitEditClick="@(() => Snackbar.Add("Saved"))" IsEditRowSwitchingBlocked="@true"
               EditTrigger="TableEditTrigger.EditButton">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Working hours in month @GetNowMonthString()</MudText>
+            <MudText Typo="Typo.h6">Working hours in month @GetMonthString()</MudText>
             <MudSpacer/>
             <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => _workDays = null)">Discard</MudButton>
         </ToolBarContent>
@@ -123,13 +123,6 @@ else
         // Refactor to single method
         // Get user Id
         _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        
-        _workDays = await MonthDayService.GetDaysInMonth(DateTimeOffset.UtcNow, _userId);
-        
-        if (_workDays != null)
-        {
-            _selectedMonth = GetNowMonthTruncated();
-        }
     }
     
     private async Task Save()
@@ -159,12 +152,12 @@ else
     {
         try
         {
-            var month = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
+            var month = await MonthDayService.GetMonth(_selectedMonth.Value, _userId);
 
             var pdfBytes = PdfService.GeneratePdf(month);
 
             // Start download
-            var fileName = $"Month_{DateTimeOffset.UtcNow.Month}_{DateTimeOffset.UtcNow.Year}.pdf";
+            var fileName = $"Month_{_selectedMonth.Value.Month}_{_selectedMonth.Value.Year}.pdf";
 
             var pdfBase64 = Convert.ToBase64String(pdfBytes);
 
@@ -180,7 +173,10 @@ else
 
     private async Task GenerateMonth()
     {
-        _workDays = await MonthDayService.BuildMonth(new DateTimeOffset(_selectedMonth.Value, TimeSpan.Zero));
+        _workDays = await MonthDayService.GetDaysInMonth(_selectedMonth.Value, _userId);
+        
+        if (_workDays == null)
+            _workDays = await MonthDayService.BuildMonth(new DateTimeOffset(_selectedMonth.Value, TimeSpan.Zero));
     }
 
     private DateTime GetNowMonthTruncated()
@@ -191,11 +187,9 @@ else
         return date;
     }
     
-    private string GetNowMonthString()
+    private string GetMonthString()
     {
-        var date = DateTimeOffset.UtcNow;
-        date = new DateTime(date.Year, date.Month, 1, 0, 0, 0);
-        
+        var date = new DateTime(_selectedMonth.Value.Year, _selectedMonth.Value.Month, 1, 0, 0, 0);
         return date.ToString("MM.yyyy");
     }
 }
