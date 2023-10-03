@@ -103,6 +103,10 @@ else
                     {
                         <MudText Typo="Typo.body1" Color="@Color.Secondary">L4</MudText>
                     }
+                    @if (context.IsVacation)
+                    {
+                        <MudText Typo="Typo.body1" Color="@Color.Success">Vacation</MudText>
+                    }
                 </MudTd>
                 <MudTd>
                     @if (!(context.IsDayOff || context.IsVacation || context.IsL4))
