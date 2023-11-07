@@ -1,7 +1,5 @@
-using WorkLogger;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using WorkLogger.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using WorkLogger.Common;
@@ -9,7 +7,6 @@ using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.ConfigModels;
 using WorkLogger.Domain.Services;
 using WorkLogger.Infrastructure.Database;
-using WorkLogger.Services;
 using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,12 +21,20 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
-        .LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
+        //.LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
         .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+builder.Services.AddAuthentication().AddGoogle(options =>
+{
+    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")!;
+    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET")!;
+});
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<HttpContextAccessor>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<HttpClient>();
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddServerSideBlazor();
@@ -50,10 +55,9 @@ if (config.HasErrors)
 }
 
 builder.Services.AddSingleton<ConfigModel>(x => config);
-builder.Services.AddScoped<IEmailSender>(x => new EmailSender(x.GetRequiredService<ConfigModel>()));
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
-builder.Services.AddScoped<IUsersService, UsersService>();
+// builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IEmployeeSettingsService, EmployeeSettingsService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
@@ -82,17 +86,17 @@ using (var scope = app.Services.CreateScope())
     }
 
     // Init roles
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-    // Create all roles
-    foreach (var roleName in Consts.RolesList)
-    {
-        var roleExists = roleManager.FindByNameAsync(roleName).Result;
-        if (roleExists == null)
-        {
-            roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
-        }
-    }
+    // var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    //
+    // // Create all roles
+    // foreach (var roleName in Consts.RolesList)
+    // {
+    //     var roleExists = roleManager.FindByNameAsync(roleName).Result;
+    //     if (roleExists == null)
+    //     {
+    //         roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
+    //     }
+    // }
     
     // Init Holidays
     if (!context.Holidays.Any())
@@ -102,6 +106,10 @@ using (var scope = app.Services.CreateScope())
         context.Holidays.AddRange(holidaysToAdd);
         context.SaveChanges();
     }
+ 
+   // var _userManager =  scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+   // foreach (var role in Consts.RolesList)
+    //    await _userManager.AddToRoleAsync(user, role);
 }
 
 app.UseHttpsRedirection();
