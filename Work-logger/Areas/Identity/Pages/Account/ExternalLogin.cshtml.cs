@@ -86,6 +86,9 @@ namespace WorkLogger.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
+            public string Name { get; set; }
+            
+            [Required]
             [EmailAddress]
             public string Email { get; set; }
         }
@@ -120,16 +123,6 @@ namespace WorkLogger.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
-                
-                // If First user then add all roles
-                if (_dbContext.Users.Count() == 1)
-                {
-                    var user = _dbContext.Users.First();
-
-                    foreach (var role in Consts.RolesList)
-                        await _userManager.AddToRoleAsync(user, role);
-                }
-                
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -167,12 +160,19 @@ namespace WorkLogger.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.Name, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    // If First user then add all roles
+                    if (_dbContext.Users.Count() == 1)
+                    {
+                        foreach (var role in Consts.RolesList)
+                            await _userManager.AddToRoleAsync(user, role);
+                    }
+                    
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
