@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using WorkLogger.Data;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using WorkLogger;
 using WorkLogger.Common;
 using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.ConfigModels;
@@ -11,36 +12,32 @@ using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.Configure<CookiePolicyOptions>(options =>
+builder.Services.AddLogging(builder =>
 {
-    // This lambda determines whether user consent for non-essential 
-    // cookies is needed for a given request.
-    options.CheckConsentNeeded = context => true;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
+    builder.AddConsole();
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
         //.LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
         .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-builder.Services.AddAuthentication().AddGoogle(options =>
-{
-    options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")!;
-    options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET")!;
-});
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+        options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<HttpContextAccessor>();
-builder.Services.AddHttpClient();
-builder.Services.AddScoped<HttpClient>();
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID", EnvironmentVariableTarget.Machine)!;
+        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET", EnvironmentVariableTarget.Machine)!;
+    });
+
 builder.Services.AddServerSideBlazor();
-
 builder.Services.AddMudServices();
-
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var config = new ConfigModel();
@@ -57,7 +54,7 @@ if (config.HasErrors)
 builder.Services.AddSingleton<ConfigModel>(x => config);
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
-// builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IEmployeeSettingsService, EmployeeSettingsService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
@@ -86,17 +83,17 @@ using (var scope = app.Services.CreateScope())
     }
 
     // Init roles
-    // var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    //
-    // // Create all roles
-    // foreach (var roleName in Consts.RolesList)
-    // {
-    //     var roleExists = roleManager.FindByNameAsync(roleName).Result;
-    //     if (roleExists == null)
-    //     {
-    //         roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
-    //     }
-    // }
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    
+    // Create all roles
+    foreach (var roleName in Consts.RolesList)
+    {
+        var roleExists = roleManager.FindByNameAsync(roleName).Result;
+        if (roleExists == null)
+        {
+            roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
+        }
+    }
     
     // Init Holidays
     if (!context.Holidays.Any())
@@ -106,16 +103,11 @@ using (var scope = app.Services.CreateScope())
         context.Holidays.AddRange(holidaysToAdd);
         context.SaveChanges();
     }
- 
-   // var _userManager =  scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-   // foreach (var role in Consts.RolesList)
-    //    await _userManager.AddToRoleAsync(user, role);
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseCookiePolicy();
 app.UseRouting();
 
 app.UseAuthentication();
