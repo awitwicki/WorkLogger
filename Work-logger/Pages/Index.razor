@@ -5,6 +5,7 @@
 @using WorkLogger.Domain.Services
 @using WorkLogger.Domain.ViewModels
 @using WorkLogger.Pages.Shared
+@using WorkLogger.Services
 
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -12,6 +13,7 @@
 @inject IMonthDayService MonthDayService
 @inject IHolidayService HolidayService
 @inject NavigationManager NavManager
+@inject IVacationService vacationService 
 
 @if (_settings == null)
 {
@@ -29,12 +31,20 @@
 }
 else
 {
-    <MudText Typo="Typo.h6">@_settings?.FullName</MudText>
-    <MudText Typo="Typo.h6">Contract started date @_settings?.ContractStartedDate.Date.ToShortDateString()</MudText>
-    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-               OnClick="@(() => _settings = null)">
-        Edit info
-    </MudButton>
+    <MudGrid Class="mt-2">
+        <MudItem md="4" xs="12">
+            <MudText Typo="Typo.h6">@_settings?.FullName</MudText>
+            <MudText Typo="Typo.h6">Contract started date @_settings?.ContractStartedDate.Date.ToShortDateString()</MudText>
+            <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                       OnClick="@(() => _settings = null)">
+                Edit info
+            </MudButton>
+        </MudItem>
+        <MudItem md="4" xs="12">
+            <MudText Typo="Typo.h3" Color="Color.Success">@_vacationDaysUsedInCurrentYear</MudText>
+            <MudText Typo="Typo.h6">vacation days left before @CalculateVacationDaysBeforeDateDate().ToShortDateString()</MudText>
+        </MudItem>
+    </MudGrid>
     
     <MudGrid Class="mt-2">
         <MudItem md="4" xs="12">
@@ -50,18 +60,15 @@ else
             </MudLink>
         </MudItem>
         <MudItem md="4" xs="12">
-            @if (_monthWorkDay == null)
+            <MudText Typo="Typo.h6">Near Holidays</MudText>
+            @foreach (var holiday in _holidays)
             {
-                <MudText Typo="Typo.h6">Near Holidays</MudText>
-                @foreach (var holiday in _holidays)
-                {
-                    <MudCard Class="my-1">
-                        <MudCardContent>
-                            <MudText>@holiday.DateDay.Date.ToString("dd.MM.yyyy")</MudText>
-                            <MudText Typo="Typo.body2">@holiday.Name</MudText>
-                        </MudCardContent>
-                    </MudCard>
-                }
+                <MudCard Class="my-1">
+                    <MudCardContent>
+                        <MudText>@holiday.DateDay.Date.ToString("dd.MM.yyyy")</MudText>
+                        <MudText Typo="Typo.body2">@holiday.Name</MudText>
+                    </MudCardContent>
+                </MudCard>
             }
         </MudItem>
     </MudGrid>
@@ -76,12 +83,31 @@ else
     
     private string _fullName { get; set; }
     private DateTime? _contractStartedDate { get; set; }
-    private int _vacationDaysGrantedPerYear { get; set; }
+    private int _vacationDaysGrantedPerYear { get; set; } = 0;
+    private int _vacationDaysUsedInCurrentYear { get; set; } = 0;
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
     ClaimsPrincipal _user;
     string _userId = "";
 
+    private async Task<int> CalculateVacationDaysBeforeDate()
+    {
+        var result = await vacationService.GetVacationDaysLeftForUser(_userId);
+        return result;
+    }
+    
+    private DateTime CalculateVacationDaysBeforeDateDate()
+    {
+        var contractSignetMonth = _settings?.ContractStartedDate.Date.Month;
+        var contractSignetDay = _settings?.ContractStartedDate.Date.Day;
+
+        var result = new DateTime(DateTime.UtcNow.Year, contractSignetMonth!.Value, contractSignetDay!.Value);
+
+        if (DateTime.UtcNow > result)
+            result = result.AddYears(1);
+
+        return result;
+    }
     protected override async Task OnInitializedAsync()
     {
         _user = (await AuthStat).User;
@@ -111,6 +137,7 @@ else
             _monthWorkDay = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
             _months = await MonthDayService.GetUserMonths(_userId);
             _holidays = await HolidayService.GetHolidays(DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddMonths(1));
+            _vacationDaysUsedInCurrentYear = await vacationService.GetVacationDaysLeftForUser(_userId);
         }
     }
     

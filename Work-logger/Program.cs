@@ -8,6 +8,7 @@ using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.ConfigModels;
 using WorkLogger.Domain.Services;
 using WorkLogger.Infrastructure.Database;
+using WorkLogger.Services;
 using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +59,7 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IEmployeeSettingsService, EmployeeSettingsService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
+builder.Services.AddScoped<IVacationService, VacationService>();
 
 builder.Services.AddSingleton<WeatherForecastService>();
 
