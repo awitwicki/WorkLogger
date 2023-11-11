@@ -1,10 +1,8 @@
 ﻿@inject NavigationManager NavManager
 
-<a href="/Identity/Account/Login">login</a>
-
 @code {
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     NavManager.NavigateTo("/Identity/Account/Login", true);
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        NavManager.NavigateTo("/Identity/Account/Login", true);
+    }
 }
