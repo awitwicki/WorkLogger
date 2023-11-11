@@ -22,8 +22,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Common", "WorkLo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Services.Tests", "WorkLogger.Services.Tests\WorkLogger.Services.Tests.csproj", "{87216AA2-58E0-496A-A493-25BC385B2A63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{256D7023-3D25-4148-86B2-49E516CF1530}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,10 +56,6 @@ Global
 		{87216AA2-58E0-496A-A493-25BC385B2A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87216AA2-58E0-496A-A493-25BC385B2A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87216AA2-58E0-496A-A493-25BC385B2A63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{256D7023-3D25-4148-86B2-49E516CF1530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{256D7023-3D25-4148-86B2-49E516CF1530}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{256D7023-3D25-4148-86B2-49E516CF1530}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{256D7023-3D25-4148-86B2-49E516CF1530}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
