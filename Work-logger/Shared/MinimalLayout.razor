@@ -20,7 +20,6 @@
                 <AuthorizeView Roles="@(Consts.AdminRole + ", " + Consts.ModeratorRole + ", " + Consts.UserRole)" Context="innerContext">
                     <Authorized>
                         <MudAppBar Elevation="1">
-                            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(() => _drawerOpen = !_drawerOpen)"/>
                             @if (!_drawerOpen)
                             {
                                 <MudText Typo="Typo.h6">Work logger</MudText>
@@ -35,16 +34,6 @@
                             </MudButton>
                             <logincontrol/>
                         </MudAppBar>
-                        
-                        @if (_settings != null)
-                        {
-                            <MudDrawer @bind-Open="@_drawerOpen" Elevation="1">
-                                <MudDrawerHeader>
-                                    <MudText Typo="Typo.h6">Work logger</MudText>
-                                </MudDrawerHeader>
-                                <NavMenu/>
-                            </MudDrawer>
-                        }
                             
                         <MudMainContent Class="pt-16 px-16">
                             <MudContainer Class="mt-6">
@@ -85,13 +74,6 @@
 
     private EmployeeSettings? _settings;
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
-    
-    protected override async Task OnInitializedAsync()
-    {
-        var _user = (await AuthStat).User;
-        var _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        _settings = await EmployeeSettingsService.GetEmployeeSettings(_userId);
-    }
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -15,48 +15,57 @@ public class UsersService : IUsersService
         _dbContext = dbContext;
         _userManager = userManager;
     }
+
+    private List<String> GetUserRoles(string userId, ICollection<IdentityRole> roles,
+        ICollection<IdentityUserRole<string>> userRoles)
+    {
+        var assignedUserRoles = userRoles.Where(y => y.UserId == userId).ToList();
+        var assignedUserRolesId = assignedUserRoles.Select(x => x.RoleId).ToList();
+
+        var filteredUerRoles = roles.Where(x => assignedUserRolesId.Contains(x.Id)).ToList();
+
+        return filteredUerRoles.Select(x => x.Name).ToList();
+    }
     
     public async Task<List<UserViewModel>> GetUsers()
     {
-        var queryUsersAndRoles = from usr in _dbContext.Users
-            join usrRoles in _dbContext.UserRoles on usr.Id equals usrRoles.UserId
-                into groupingUserRoles
-            from usrRoles in groupingUserRoles.DefaultIfEmpty()
-           
-            join settings in _dbContext.EmployeeSettings on usr.Id equals settings.EmployeeId
-                into groupingsettings
-            from settings in groupingsettings.DefaultIfEmpty()
-            
-            join roles in _dbContext.Roles on usrRoles.RoleId equals roles.Id
-                into groupingRoles
-            from roles in groupingRoles.DefaultIfEmpty()
-            select new { User = usr, UserRoles = roles, EmployeeSettings = settings  };
-       
-        var normalizedUsersViewModel = await queryUsersAndRoles.GroupBy(x => x.User.Id)
-            .Select(x => new UserViewModel
+        var users = await _dbContext.Users.AsNoTracking().ToListAsync();
+        var employeeSettings = await _dbContext.EmployeeSettings.AsNoTracking().ToListAsync();
+        var roles = await _dbContext.Roles.AsNoTracking().ToListAsync();
+        var userRoles = await _dbContext.UserRoles.AsNoTracking().ToListAsync();
+
+        var result = users.Select(x => new UserViewModel
             {
-                User = x.First().User,
-                UserRoles = x.Select(r => r.UserRoles.Name!).Distinct().ToList(),
-                EmployeeSettings = x.First().EmployeeSettings
+                User = x,
+                UserRoles = GetUserRoles(x.Id, roles, userRoles),
+                EmployeeSettings = employeeSettings.FirstOrDefault(y => y.EmployeeId == x.Id)
             })
-            .ToListAsync();
+            .ToList();
 
-        normalizedUsersViewModel
-            .Where(x => x.EmployeeSettings != null)
-            .ToList()
-            .ForEach(x =>
-                _dbContext.Entry(x.EmployeeSettings).State = EntityState.Detached);
-
-        return normalizedUsersViewModel;
+        return result;
     }
     
-    public async Task AddRoleToUser(string userId, string role)
+    public async Task AddRoleToUser(string userId, string roleName)
     {
-        IdentityUser user = new IdentityUser { Id = userId };
+        try
+        {
+            var role = await _dbContext.Roles.AsNoTracking().FirstAsync(x => x.Name == roleName);
 
-        await _userManager.AddToRoleAsync(user, role);
-
-        await _dbContext.SaveChangesAsync();
+            var identityUserRole = new IdentityUserRole<string>
+            {
+                UserId = userId,
+                RoleId = role.Id
+            };
+            
+            await _dbContext.UserRoles.AddAsync(identityUserRole);
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+      
     }
 
     public async Task<IEnumerable<string>> GetUserRoles(string userId)
@@ -64,17 +73,15 @@ public class UsersService : IUsersService
         IdentityUser user = new IdentityUser { Id = userId };
 
         var userRoles = await _userManager.GetRolesAsync(user);
-
+        
+        _dbContext.Entry(user).State = EntityState.Detached;
         return userRoles;
     }
 
     public async Task CleanUserRoles(string userId)
     {
-        IdentityUser user = new IdentityUser { Id = userId };
-
-        var userRoles = await _userManager.GetRolesAsync(user);
-        await _userManager.RemoveFromRolesAsync(new IdentityUser { Id = userId }, userRoles);
-
+        var rolesToRemove = await _dbContext.UserRoles.Where(x => x.UserId == userId).ToListAsync();
+        _dbContext.UserRoles.RemoveRange(rolesToRemove);
         await _dbContext.SaveChangesAsync();
     }
 
