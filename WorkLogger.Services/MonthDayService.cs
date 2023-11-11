@@ -105,7 +105,9 @@ public class MonthDayService : IMonthDayService
         var employeeSettings = await _dbContext.EmployeeSettings
             .Where(x => x.EmployeeId == userId)
             .FirstAsync();
-
+        
+        _dbContext.Entry(employeeSettings).State = EntityState.Detached;
+        
         if (employeeSettings == null)
             throw new Exception("Employee settings is not defined");
         
@@ -171,6 +173,8 @@ public class MonthDayService : IMonthDayService
         var employeeSettings = await _dbContext.EmployeeSettings
             .Where(x => x.EmployeeId == userId)
             .FirstAsync();
+        
+        _dbContext.Entry(employeeSettings).State = EntityState.Detached;
         
         // Add holidays
         foreach (var monthViewModel in monthViewModelCollection)

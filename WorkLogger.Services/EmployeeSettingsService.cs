@@ -13,10 +13,17 @@ public class EmployeeSettingsService : IEmployeeSettingsService
         _dbContext = dbContext;
     }
     
-    public Task<EmployeeSettings> GetEmployeeSettings(string employeeId)
+    public async Task<EmployeeSettings> GetEmployeeSettings(string employeeId)
     {
-        return _dbContext.EmployeeSettings.AsNoTracking()
+        var result = await _dbContext.EmployeeSettings.AsNoTracking()
             .FirstOrDefaultAsync(x => x.EmployeeId == employeeId);
+
+        if (result != null)
+        {
+            _dbContext.Entry(result).State = EntityState.Detached;
+        }
+        
+        return result;
     }
 
     public async Task SaveOrUpdateEmployeeSettings(EmployeeSettings employeeSettings)
