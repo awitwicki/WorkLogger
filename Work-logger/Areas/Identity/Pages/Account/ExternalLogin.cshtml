@@ -9,15 +9,10 @@
     <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
         <div class="row">
-            <input asp-for="Input.Name" class="form-control" autocomplete="name" placeholder="Please enter your full name."/>
-            <span asp-validation-for="Input.Name" class="text-danger"></span>
-        </div>
-        <div class="row">
              <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter your email."/>
              <span asp-validation-for="Input.Email" class="text-danger"></span>
         </div>
         <div class="row button">
-            @* <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Login</button> *@
             <button type="submit" class="w-100 btn btn-lg btn-primary">Confirm</button>
         </div>
     </form>
