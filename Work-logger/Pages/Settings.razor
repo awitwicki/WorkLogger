@@ -1,0 +1,87 @@
+﻿@page "/settings"
+@using WorkLogger.Services.Services
+@using WorkLogger.Domain.Entities
+@using System.Security.Claims
+@using WorkLogger.Pages.Shared
+
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject IEmployeeSettingsService EmployeeSettingsService
+@inject NavigationManager NavManager
+@layout MinimalLayout
+
+    <MudText Typo="Typo.h6">Please provide additional information:</MudText>
+    <MudGrid>
+        <MudItem xs="6">
+            <MudPaper Class="pa-4">
+                <MudTextField @bind-Value="_fullName" Label="Full Name" Variant="Variant.Outlined"/>
+                <MudDatePicker Class="my-2" @bind-Date="_contractStartedDate" Label="Contract started date"  Variant="Variant.Outlined"/>
+                <MudNumericField @bind-Value="_vacationDaysGrantedPerYear" Min="0" Max="365" Label="Vacations on Uop per year" Variant="Variant.Outlined" />
+                <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSettings">Save and exit</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+@code {
+    private EmployeeSettings? _settings;
+    private long? _settingsId;
+    
+    private string _fullName { get; set; }
+    private int _vacationDaysGrantedPerYear { get; set; }
+    private DateTime? _contractStartedDate { get; set; }
+    
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+    ClaimsPrincipal _user;
+    string _userId = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = (await AuthStat).User;
+        
+        // TODO:
+        // Refactor to single method
+        // Get user Id
+        _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        _settings = await EmployeeSettingsService.GetEmployeeSettings(_userId);
+
+        await InitFields();
+    }
+
+    private async Task InitFields()
+    {
+        if (_settings != null)
+        {
+            _fullName = _settings.FullName;
+            _contractStartedDate = _settings.ContractStartedDate.Date;
+            _settingsId = _settings.Id;
+            _vacationDaysGrantedPerYear = _settings.VacationDaysPerYear;
+        }
+    }
+    
+    private async Task SaveSettings()
+    {
+        if (_contractStartedDate.HasValue && !string.IsNullOrEmpty(_fullName))
+        {
+            var _employeeSettings = new EmployeeSettings
+            {
+                Id = _settingsId ?? 0,
+                EmployeeId = _userId,
+                FullName = _fullName,
+                ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero),
+                VacationDaysPerYear = _vacationDaysGrantedPerYear
+            };
+
+            await EmployeeSettingsService.SaveOrUpdateEmployeeSettings(_employeeSettings);
+            
+            _settings = _employeeSettings;
+            
+            Snackbar.Add("Settings saved");
+            
+            NavManager.NavigateTo("/", true);
+        }
+        else
+        {
+            DialogService.Show<InfoDialog>("Please Fill all fields");
+        }
+    }
+}

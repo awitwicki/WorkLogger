@@ -1,9 +1,8 @@
-using WorkLogger;
-using WorkLogger.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using WorkLogger.Data;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using WorkLogger;
 using WorkLogger.Common;
 using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.ConfigModels;
@@ -14,28 +13,32 @@ using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.Configure<CookiePolicyOptions>(options =>
+builder.Services.AddLogging(builder =>
 {
-    // This lambda determines whether user consent for non-essential 
-    // cookies is needed for a given request.
-    options.CheckConsentNeeded = context => true;
-    options.MinimumSameSitePolicy = SameSiteMode.None;
+    builder.AddConsole();
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
-        .LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
+        //.LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
         .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+        options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID", EnvironmentVariableTarget.Machine)!;
+        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET", EnvironmentVariableTarget.Machine)!;
+    });
+
 builder.Services.AddServerSideBlazor();
-
 builder.Services.AddMudServices();
-
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var config = new ConfigModel();
@@ -50,13 +53,13 @@ if (config.HasErrors)
 }
 
 builder.Services.AddSingleton<ConfigModel>(x => config);
-builder.Services.AddScoped<IEmailSender>(x => new EmailSender(x.GetRequiredService<ConfigModel>()));
 
 builder.Services.AddScoped<IMonthDayService, MonthDayService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IEmployeeSettingsService, EmployeeSettingsService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IHolidayService, HolidayService>();
+builder.Services.AddScoped<IVacationService, VacationService>();
 
 builder.Services.AddSingleton<WeatherForecastService>();
 
@@ -83,7 +86,7 @@ using (var scope = app.Services.CreateScope())
 
     // Init roles
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
+    
     // Create all roles
     foreach (var roleName in Consts.RolesList)
     {
@@ -107,7 +110,6 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseCookiePolicy();
 app.UseRouting();
 
 app.UseAuthentication();

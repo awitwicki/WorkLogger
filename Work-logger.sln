@@ -5,22 +5,22 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Work-logger", "Work-logger\Work-logger.csproj", "{8FB6E634-AB7B-413A-8598-48F92CCC5BE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkLogger.Domain", "WorkLogger.Domain\WorkLogger.Domain.csproj", "{95A301AC-9BB9-48A9-9CF7-D77502C3EC3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Domain", "WorkLogger.Domain\WorkLogger.Domain.csproj", "{95A301AC-9BB9-48A9-9CF7-D77502C3EC3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkLogger.Infrastructure", "WorkLogger.Infrastructure\WorkLogger.Infrastructure.csproj", "{4A11A309-CB92-4E1C-8629-994CE1BD5503}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Infrastructure", "WorkLogger.Infrastructure\WorkLogger.Infrastructure.csproj", "{4A11A309-CB92-4E1C-8629-994CE1BD5503}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkLogger.Domain.Tests", "WorkLogger.Domain.Tests\WorkLogger.Domain.Tests.csproj", "{16125F49-18AF-46C1-9783-C4F71D223396}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Domain.Tests", "WorkLogger.Domain.Tests\WorkLogger.Domain.Tests.csproj", "{16125F49-18AF-46C1-9783-C4F71D223396}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkLogger.Services", "WorkLogger.Services\WorkLogger.Services.csproj", "{F560C7FA-BD8F-4A26-A579-E1FC9F0B0A74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Services", "WorkLogger.Services\WorkLogger.Services.csproj", "{F560C7FA-BD8F-4A26-A579-E1FC9F0B0A74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{88BEE8BF-9142-4AEC-8656-83E2D308BEA1}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkLogger.Common", "WorkLogger.Common\WorkLogger.Common.csproj", "{2C696C3A-0D6E-4487-AC6B-8704DAF358CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Common", "WorkLogger.Common\WorkLogger.Common.csproj", "{2C696C3A-0D6E-4487-AC6B-8704DAF358CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkLogger.Services.Tests", "WorkLogger.Services.Tests\WorkLogger.Services.Tests.csproj", "{87216AA2-58E0-496A-A493-25BC385B2A63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkLogger.Services.Tests", "WorkLogger.Services.Tests\WorkLogger.Services.Tests.csproj", "{87216AA2-58E0-496A-A493-25BC385B2A63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,39 +1,23 @@
 ﻿@page
 @model LoginModel
+
 @{
     ViewData["Title"] = "Log in";
 }
 
 <div class="wrapper">
     <div class="title"><span>Login</span></div>
-    <form id="account" method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-        <div class="row">
-            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-            <span asp-validation-for="Input.Email" class="text-danger"></span>
-        </div>
-        <div class="row mt-8">
-            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-            <span asp-validation-for="Input.Password" class="text-danger"></span>
-        </div>
-        <div class="mb-4 mt-8">
-            <label asp-for="Input.RememberMe" class="form-label">
-                <input class="form-check-input" asp-for="Input.RememberMe" />
-                @Html.DisplayNameFor(m => m.Input.RememberMe)
-            </label>
-        </div>
-        <div class="row button">
-            <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Login</button>
-        </div>
-        <div class="form-help-links mt-2 d-flex flex-column justify-end">
-            <a asp-page="./ForgotPassword" asp-route-returnUrl="@Model.ReturnUrl">Forgot password</a>
-        </div>
-        <div class="form-help-links mt-2 d-flex flex-column justify-end">
-            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-        </div>
-    </form>
+     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+         <div>
+             <p>
+                 @foreach (var provider in Model.ExternalLogins!)
+                 {
+                     <div class="row button">
+                         @* <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Login By Google</button> *@
+                     <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">Login by @provider.DisplayName</button>
+                     </div>
+                 }
+             </p>
+         </div>
+     </form>
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

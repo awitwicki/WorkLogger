@@ -1,0 +1,23 @@
+﻿@page
+@model ExternalLoginModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="wrapper">
+    <div class="title"><span>Additional data</span></div>
+    <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+        <div class="row">
+             <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter your email."/>
+             <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="row button">
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Confirm</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
