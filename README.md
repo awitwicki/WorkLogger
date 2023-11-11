@@ -8,14 +8,11 @@
 
 ## How to run
 
-1. Create `.env` file and fill with necessary params (where `xxxxxxxxxx` is your secret and database is PostgreSQL):
+1. Create `.env` file and fill with necessary params (where `xxxxxxxxxx` is your secrets):
     ```
         DB_CONNECTION_STRING=xxxxxxxxxx
-        SmtpHost=xxxxxxxxxx
-        SmtpPort=xxxxxxxxxx
-        SmtpUsername=xxxxxxxxxx
-        SmtpPassword=xxxxxxxxxx
-        EmailFrom=xxxxxxxxxx
+        GOOGLE_OAUTH_CLIENT_ID=xxxxxxxxxx;
+        GOOGLE_OAUTH_CLIENT_SECRET=xxxxxxxxxx;
    ```
 
 2. `docker-compose up --build -d`
