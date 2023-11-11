@@ -20,8 +20,6 @@ public class LogoutModel : PageModel
 
     private readonly ILogger<LogoutModel> _logger;
 
-    public string ReturnUrl { get; private set; }
-
     public async Task<IActionResult> OnGetAsync(string returnUrl = null)
     {
         await _signInManager.SignOutAsync();
