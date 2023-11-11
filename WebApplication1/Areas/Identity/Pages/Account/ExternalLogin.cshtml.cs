@@ -17,32 +17,35 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using WebApplication1.Data;
 
 namespace WebApplication1.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
+        private readonly ApplicationDbContext _dbContext;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserStore<IdentityUser> _userStore;
-        private readonly IUserEmailStore<IdentityUser> _emailStore;
-        private readonly IEmailSender _emailSender;
+       // private readonly IUserEmailStore<IdentityUser> _emailStore;
+            //private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ExternalLoginModel(
-            SignInManager<IdentityUser> signInManager,
+        public ExternalLoginModel(SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext dbContext)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _userStore = userStore;
-            _emailStore = GetEmailStore();
             _logger = logger;
-            _emailSender = emailSender;
+            _roleManager = roleManager;
+            _dbContext = dbContext;
         }
 
         /// <summary>
@@ -116,6 +119,27 @@ namespace WebApplication1.Areas.Identity.Pages.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                
+                
+                var roleName = "admin";
+                var roleExists = await _roleManager.FindByNameAsync(roleName);
+                  
+                if (roleExists == null)
+                {
+                    _roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
+                }
+                        
+                
+                var user = CreateUser();
+
+                    // If First user then add all roles
+                    if (_dbContext.Users.Count() == 1)
+                    {
+                        await _userManager.AddToRoleAsync(user, roleName);
+                    }
+                
+                
+                
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -154,7 +178,7 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                 var user = CreateUser();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                //await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
 
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
@@ -173,8 +197,8 @@ namespace WebApplication1.Areas.Identity.Pages.Account
                             values: new { area = "Identity", userId = userId, code = code },
                             protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                       // await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                         //   $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)
