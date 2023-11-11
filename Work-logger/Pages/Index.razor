@@ -87,9 +87,13 @@ else
         // Refactor to single method
         // Get user Id
         _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        
         _settings = await EmployeeSettingsService.GetEmployeeSettings(_userId);
 
+        await InitFields();
+    }
+
+    private async Task InitFields()
+    {
         if (_settings != null)
         {
             _fullName = _settings.FullName;
@@ -118,6 +122,7 @@ else
             _settings = _employeeSettings;
             
             Snackbar.Add("Settings saved");
+            await InitFields();
         }
         else
         {
