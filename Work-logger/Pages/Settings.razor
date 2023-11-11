@@ -10,34 +10,24 @@
 @inject NavigationManager NavManager
 @layout MinimalLayout
 
-@if (_settings == null)
-{
     <MudText Typo="Typo.h6">Please provide additional information:</MudText>
     <MudGrid>
         <MudItem xs="6">
             <MudPaper Class="pa-4">
                 <MudTextField @bind-Value="_fullName" Label="Full Name" Variant="Variant.Outlined"/>
                 <MudDatePicker Class="my-2" @bind-Date="_contractStartedDate" Label="Contract started date"  Variant="Variant.Outlined"/>
+                <MudNumericField @bind-Value="_vacationDaysGrantedPerYear" Min="0" Max="365" Label="Vacations on Uop per year" Variant="Variant.Outlined" />
                 <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSettings">Save and exit</MudButton>
             </MudPaper>
         </MudItem>
     </MudGrid>
-}
-else
-{
-    <MudText Typo="Typo.h6">@_settings?.FullName</MudText>
-    <MudText Typo="Typo.h6">Contract started date @_settings?.ContractStartedDate.Date.ToShortDateString()</MudText>
-    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Edit" Color="Color.Primary"
-               OnClick="@(() => _settings = null)">
-        Edit info
-    </MudButton>
-}
 
 @code {
     private EmployeeSettings? _settings;
     private long? _settingsId;
     
     private string _fullName { get; set; }
+    private int _vacationDaysGrantedPerYear { get; set; }
     private DateTime? _contractStartedDate { get; set; }
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
@@ -64,6 +54,7 @@ else
             _fullName = _settings.FullName;
             _contractStartedDate = _settings.ContractStartedDate.Date;
             _settingsId = _settings.Id;
+            _vacationDaysGrantedPerYear = _settings.VacationDaysPerYear;
         }
     }
     
@@ -76,7 +67,8 @@ else
                 Id = _settingsId ?? 0,
                 EmployeeId = _userId,
                 FullName = _fullName,
-                ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero)
+                ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero),
+                VacationDaysPerYear = _vacationDaysGrantedPerYear
             };
 
             await EmployeeSettingsService.SaveOrUpdateEmployeeSettings(_employeeSettings);

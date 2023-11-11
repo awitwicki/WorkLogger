@@ -21,6 +21,7 @@
             <MudPaper Class="pa-4">
                 <MudTextField @bind-Value="_fullName" Label="Full Name" Variant="Variant.Outlined"/>
                 <MudDatePicker Class="my-2" @bind-Date="_contractStartedDate" Label="Contract started date"  Variant="Variant.Outlined"/>
+                <MudNumericField @bind-Value="_vacationDaysGrantedPerYear" Min="0" Max="365" Label="Vacations on Uop per year" Variant="Variant.Outlined" />
                 <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSettings">Save</MudButton>
             </MudPaper>
         </MudItem>
@@ -75,6 +76,7 @@ else
     
     private string _fullName { get; set; }
     private DateTime? _contractStartedDate { get; set; }
+    private int _vacationDaysGrantedPerYear { get; set; }
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
     ClaimsPrincipal _user;
@@ -104,6 +106,7 @@ else
         {
             _fullName = _settings.FullName;
             _contractStartedDate = _settings.ContractStartedDate.Date;
+            _vacationDaysGrantedPerYear = _settings.VacationDaysPerYear;
             _settingsId = _settings.Id;
             _monthWorkDay = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
             _months = await MonthDayService.GetUserMonths(_userId);
@@ -120,7 +123,8 @@ else
                 Id = _settingsId ?? 0,
                 EmployeeId = _userId,
                 FullName = _fullName,
-                ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero)
+                ContractStartedDate =  new DateTimeOffset(_contractStartedDate!.Value, TimeSpan.Zero),
+                VacationDaysPerYear = _vacationDaysGrantedPerYear
             };
 
             await EmployeeSettingsService.SaveOrUpdateEmployeeSettings(_employeeSettings);

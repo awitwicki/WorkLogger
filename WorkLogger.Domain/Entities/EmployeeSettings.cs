@@ -11,6 +11,7 @@ public class EmployeeSettings
 
     public string FullName { get; set; }
     public DateTimeOffset ContractStartedDate { get; set; }
+    public int VacationDaysPerYear { get; set; }
     
     public bool IsRequiredToFill { get; set; } 
 }
