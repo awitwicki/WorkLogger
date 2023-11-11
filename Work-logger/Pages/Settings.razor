@@ -1,17 +1,14 @@
-﻿@page "/"
+﻿@page "/settings"
 @using WorkLogger.Services.Services
 @using WorkLogger.Domain.Entities
 @using System.Security.Claims
-@using WorkLogger.Domain.Services
-@using WorkLogger.Domain.ViewModels
 @using WorkLogger.Pages.Shared
 
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject IEmployeeSettingsService EmployeeSettingsService
-@inject IMonthDayService MonthDayService
-@inject IHolidayService HolidayService
 @inject NavigationManager NavManager
+@layout MinimalLayout
 
 @if (_settings == null)
 {
@@ -21,7 +18,7 @@
             <MudPaper Class="pa-4">
                 <MudTextField @bind-Value="_fullName" Label="Full Name" Variant="Variant.Outlined"/>
                 <MudDatePicker Class="my-2" @bind-Date="_contractStartedDate" Label="Contract started date"  Variant="Variant.Outlined"/>
-                <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSettings">Save</MudButton>
+                <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveSettings">Save and exit</MudButton>
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -34,42 +31,9 @@ else
                OnClick="@(() => _settings = null)">
         Edit info
     </MudButton>
-    
-    <MudGrid Class="mt-2">
-        <MudItem md="4" xs="12">
-            <MudText Typo="Typo.h6">User months</MudText>
-            @foreach (var month in _months.TakeLast(5))
-            {
-                <MudLink Href=@($"/month/{month.DateMonth.ToString("yyyy.MM")}")>
-                    <MudAlert Severity="Severity.Success" Variant="Variant.Filled" Class="my-2">@month.DateMonth.Date.ToString("MM.yyyy")</MudAlert>
-                </MudLink>
-            }
-            <MudLink Href="/month">
-                <MudAlert Severity="Severity.Info" Variant="Variant.Filled" Class="my-2">Fill new month</MudAlert>
-            </MudLink>
-        </MudItem>
-        <MudItem md="4" xs="12">
-            @if (_monthWorkDay == null)
-            {
-                <MudText Typo="Typo.h6">Near Holidays</MudText>
-                @foreach (var holiday in _holidays)
-                {
-                    <MudCard Class="my-1">
-                        <MudCardContent>
-                            <MudText>@holiday.DateDay.Date.ToString("dd.MM.yyyy")</MudText>
-                            <MudText Typo="Typo.body2">@holiday.Name</MudText>
-                        </MudCardContent>
-                    </MudCard>
-                }
-            }
-        </MudItem>
-    </MudGrid>
 }
 
 @code {
-    private UserWorkMonthViewModel? _monthWorkDay;
-    private IEnumerable<UserWorkMonthViewModel> _months = new List<UserWorkMonthViewModel>();
-    private IEnumerable<Holiday> _holidays;
     private EmployeeSettings? _settings;
     private long? _settingsId;
     
@@ -90,11 +54,6 @@ else
         _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         _settings = await EmployeeSettingsService.GetEmployeeSettings(_userId);
 
-        if (_settings == null)
-        {
-            NavManager.NavigateTo("/settings", true);
-        }
-        
         await InitFields();
     }
 
@@ -105,9 +64,6 @@ else
             _fullName = _settings.FullName;
             _contractStartedDate = _settings.ContractStartedDate.Date;
             _settingsId = _settings.Id;
-            _monthWorkDay = await MonthDayService.GetMonth(DateTimeOffset.UtcNow, _userId);
-            _months = await MonthDayService.GetUserMonths(_userId);
-            _holidays = await HolidayService.GetHolidays(DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddMonths(1));
         }
     }
     
@@ -128,7 +84,8 @@ else
             _settings = _employeeSettings;
             
             Snackbar.Add("Settings saved");
-            await InitFields();
+            
+            NavManager.NavigateTo("/", true);
         }
         else
         {
