@@ -16,6 +16,7 @@ COPY ["Work-logger/Work-logger.csproj", "Work-logger/"]
 COPY ["WorkLogger.Domain/WorkLogger.Domain.csproj", "WorkLogger.Domain/"]
 COPY ["WorkLogger.Infrastructure/WorkLogger.Infrastructure.csproj", "WorkLogger.Infrastructure/"]
 COPY ["WorkLogger.Services/WorkLogger.Services.csproj", "WorkLogger.Services/"]
+COPY ["WorkLogger.Common/WorkLogger.Common.csproj", "WorkLogger.Common/"]
 RUN dotnet restore "Work-logger/Work-logger.csproj"
 COPY . .
 WORKDIR "/src/Work-logger"
