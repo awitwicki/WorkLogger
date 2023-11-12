@@ -19,8 +19,9 @@ builder.Services.AddLogging(builder =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options
-        //.LogTo(Console.WriteLine, (_, level) => level == LogLevel.Information)
-        .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
+         .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
+
+builder.Services.AddTransient<ApplicationDbContext>();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         options.SignIn.RequireConfirmedAccount = false)
@@ -33,8 +34,8 @@ builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddAuthentication()
     .AddGoogle(options =>
     {
-        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID", EnvironmentVariableTarget.Machine)!;
-        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET", EnvironmentVariableTarget.Machine)!;
+        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")!;
+        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET")!;
     });
 
 builder.Services.AddServerSideBlazor();
