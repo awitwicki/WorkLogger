@@ -11,6 +11,10 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+
+# Встановлюємо потрібні пакети для генерації сертифікату
+RUN apt-get update && apt-get install -y openssl
+
 WORKDIR /src
 COPY ["Work-logger/Work-logger.csproj", "Work-logger/"]
 COPY ["WorkLogger.Domain/WorkLogger.Domain.csproj", "WorkLogger.Domain/"]
@@ -22,7 +26,11 @@ COPY . .
 WORKDIR "/src/Work-logger"
 RUN dotnet build "Work-logger.csproj" -c Release -o /app/build
 
-RUN dotnet dev-certs https -ep /cert/Work-logger.pfx -p pa55w_0Rd
+
+# Генерація самопідписаного сертифікату
+RUN openssl req -newkey rsa:2048 -nodes -keyout server.key -x509 -days 365 -out server.crt -subj "/C=EU/ST=Kodzustate/L=City/O=Kv/CN=kv.io"
+RUN openssl pkcs12 -export -out Work-logger.pfx -inkey server.key -in server.crt -password pass:pa55w_0Rd
+
 
 FROM build AS publish
 RUN dotnet publish "Work-logger.csproj" -c Release -o /app/publish /p:UseAppHost=false
@@ -30,5 +38,7 @@ RUN dotnet publish "Work-logger.csproj" -c Release -o /app/publish /p:UseAppHost
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=build /cert/Work-logger.pfx /https/Work-logger.pfx
+
+COPY --from=build /src/Work-logger/Work-logger.pfx /https/
+
 ENTRYPOINT ["dotnet", "Work-logger.dll"]
