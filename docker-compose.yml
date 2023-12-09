@@ -6,18 +6,18 @@
       context: .
       dockerfile: Work-logger/Dockerfile
     ports:
-      - "8887:80"
       - "8888:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_URLS=https://+:443
       - ASPNETCORE_Kestrel__Certificates__Default__Password=pa55w_0Rd
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/Work-logger.pfx
     env_file:
       - .env
     networks:
       - kodzuverse
+
 networks:
   kodzuverse:
     name: kodzuverse_network
-    external: true
+    driver: bridge
