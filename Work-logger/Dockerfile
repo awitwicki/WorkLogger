@@ -1,13 +1,12 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
 # QuestPDF is based in SkiaSharp, which requires some extra dependencies
 # libfontconfig1 and fontconfig packages are required for SkiaSharp to work
-RUN sed -i'.bak' 's/$/ contrib/' /etc/apt/sources.list
 RUN apt-get update && apt-get install -y libfontconfig1 fontconfig fonts-liberation libc6 libc6-dev libgtk2.0-0 libnss3 libatk-bridge2.0-0 libx11-xcb1 libxcb-dri3-0 libdrm-common libgbm1 libasound2 libappindicator3-1 libxrender1 libfontconfig1 libxshmfence1
 RUN chmod 777 .
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 # Required for making self signed cert
 RUN apt-get update && apt-get install -y openssl
