@@ -85,6 +85,13 @@ public class UsersService : IUsersService
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task RemoveUser(string userId)
+    {
+        var user = await _dbContext.Users.Where(x => x.Id == userId).FirstAsync();
+        _dbContext.Users.Remove(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<IdentityRole>> GetAllRoles()
     {
         return await _dbContext.Roles

@@ -9,5 +9,6 @@ public interface IUsersService
     Task AddRoleToUser(string userId, string roleName);
     Task<IEnumerable<string>> GetUserRoles(string userId);
     Task CleanUserRoles(string userId);
+    Task RemoveUser(string userId);
     Task<IEnumerable<IdentityRole>> GetAllRoles();
 }

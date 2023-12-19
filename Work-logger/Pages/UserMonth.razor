@@ -6,7 +6,10 @@
 @using WorkLogger.Services.Services
 @using WorkLogger.Domain.Services
 @using WorkLogger.Pages.Shared
+@using System.Security.Claims
+@using WorkLogger.Common.AspExtensions
 
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 @inject IJSRuntime js
 @inject IDialogService DialogService
 @inject IUsersService UsersService
@@ -38,24 +41,51 @@
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
-                        <MudButton Variant="Variant.Filled"
-                                   OnClick="@(() => AddUserRole(user.User.Id))"
-                                   Color="Color.Primary">
-                            Add role
-                        </MudButton>
-                        <MudButton Class="my-2"
-                                   Variant="Variant.Filled"
-                                   OnClick="@(() => ClearUserRoles(user.User.Id))"
-                                   Color="Color.Error">
-                            Clear roles
-                        </MudButton>
-                        <MudButton Class="my-2"
-                                   Variant="Variant.Filled"
-                                   EndIcon="@Icons.Material.Filled.CalendarMonth"
-                                   OnClick="@(() => LoadUser(user))"
-                                   Color="Color.Primary">
-                            User workdays
-                        </MudButton>
+                        <MudGrid Spacing="2" Justify="Justify.FlexStart">
+                            <MudItem>
+                                <MudButton Variant="Variant.Filled"
+                                           OnClick="@(() => AddUserRole(user.User.Id))"
+                                           Color="Color.Primary">
+                                Add role
+                                </MudButton>
+                            </MudItem>
+                            @if (user.User.Id != User.GetUserId() || IsAdmin)
+                            {
+                                @if ((user.UserRoles.Contains(Consts.AdminRole) && IsAdmin) ||
+                                     !user.UserRoles.Contains(Consts.AdminRole))
+                                {
+                                    <MudItem>
+                                        <MudButton Variant="Variant.Filled"
+                                                   OnClick="@(() => ClearUserRoles(user.User.Id))"
+                                                   Color="Color.Error">
+                                            Clear roles
+                                        </MudButton>
+                                    </MudItem>
+                                }
+                            }
+                            <MudItem>
+                                <MudButton Variant="Variant.Filled"
+                                           EndIcon="@Icons.Material.Filled.CalendarMonth"
+                                           OnClick="@(() => LoadUser(user))"
+                                           Color="Color.Primary">
+                                    User workdays
+                                </MudButton>
+                            </MudItem>
+                            @if (user.User.Id != User.GetUserId())
+                            {
+                                <MudItem>
+                                    <AuthorizeView Roles="@Consts.AdminRole" Context="innerContext">
+                                        <Authorized>
+                                            <MudButton Variant="Variant.Filled"
+                                                       OnClick="@(() => RemoveUser(user.User.Id))"
+                                                       Color="Color.Error">
+                                                Remove user
+                                            </MudButton>
+                                        </Authorized>
+                                    </AuthorizeView>
+                                </MudItem>
+                            }
+                        </MudGrid>
                     </MudCardContent>
                 </MudPaper>
             </MudItem>
@@ -140,7 +170,7 @@ else
             Return
         </MudButton>
 
-        if (_selectedUser.User.EmployeeSettings == null)
+        if (_selectedUser?.User.EmployeeSettings == null)
         {
             <MudText Class="mt-4" Color="@Color.Error" Typo="Typo.h4">Settings is empty</MudText>
         }
@@ -183,11 +213,16 @@ else
 }
 
 @code {
+    ClaimsPrincipal User;
+    bool IsAdmin;
     IEnumerable<UserViewModel> _users = new List<UserViewModel>();
     UserMonthsViewModel? _selectedUser { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        User = authState.User;
+        IsAdmin = User.IsInRole(Consts.AdminRole);
         _users = await UsersService.GetUsers();
     }
     
@@ -246,6 +281,26 @@ else
 
             _users = await UsersService.GetUsers();
             
+            StateHasChanged();
+        }
+    }
+    
+    async Task RemoveUser(string userId)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Confirm deleting User!");
+        parameters.Add("ButtonText", "Remove");
+        parameters.Add("Color", Color.Error);
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = DialogService.Show<DeleteDialog>("Delete user", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && (bool)result.Data)
+        {
+            await UsersService.RemoveUser(userId);
+            _users = await UsersService.GetUsers();
             StateHasChanged();
         }
     }
