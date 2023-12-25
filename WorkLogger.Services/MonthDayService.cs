@@ -3,11 +3,10 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using WorkLogger.Common.DateExtensions;
 using WorkLogger.Domain.Entities;
-using WorkLogger.Domain.Services;
 using WorkLogger.Domain.ViewModels;
 using WorkLogger.Infrastructure.Database;
 
-namespace WorkLogger.Services.Services;
+namespace WorkLogger.Services;
 
 public class MonthDayService : IMonthDayService
 {

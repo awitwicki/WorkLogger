@@ -6,10 +6,8 @@ using WorkLogger;
 using WorkLogger.Common;
 using WorkLogger.Domain.Automapper;
 using WorkLogger.Domain.ConfigModels;
-using WorkLogger.Domain.Services;
 using WorkLogger.Infrastructure.Database;
 using WorkLogger.Services;
-using WorkLogger.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

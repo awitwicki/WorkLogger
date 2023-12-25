@@ -2,7 +2,7 @@
 using WorkLogger.Domain.Entities;
 using WorkLogger.Infrastructure.Database;
 
-namespace WorkLogger.Services.Services;
+namespace WorkLogger.Services;
 
 public class EmployeeSettingsService : IEmployeeSettingsService
 {

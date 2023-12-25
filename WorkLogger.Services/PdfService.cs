@@ -2,7 +2,7 @@
 using WorkLogger.Domain.PdfModels;
 using WorkLogger.Domain.ViewModels;
 
-namespace WorkLogger.Services.Services;
+namespace WorkLogger.Services;
 
 public class PdfService : IPdfService
 {

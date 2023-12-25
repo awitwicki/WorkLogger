@@ -1,6 +1,6 @@
 ﻿using WorkLogger.Domain.Entities;
 
-namespace WorkLogger.Services.Services;
+namespace WorkLogger.Services;
 
 public interface IHolidayService
 {

@@ -1,18 +1,21 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WorkLogger.Domain.ViewModels;
 using WorkLogger.Infrastructure.Database;
 
-namespace WorkLogger.Services.Services;
+namespace WorkLogger.Services;
 
 public class UsersService : IUsersService
 {
     private readonly ApplicationDbContext _dbContext;
-    public UserManager<IdentityUser> _userManager { get; set; }
-    
-    public UsersService(ApplicationDbContext dbContext, UserManager<IdentityUser> userManager)
+    private readonly ILogger<UsersService> _logger;
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public UsersService(ApplicationDbContext dbContext, ILogger<UsersService> logger, UserManager<IdentityUser> userManager)
     {
         _dbContext = dbContext;
+        _logger = logger;
         _userManager = userManager;
     }
 
@@ -62,10 +65,9 @@ public class UsersService : IUsersService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError(e, "Can't add role to user");
             throw;
         }
-      
     }
 
     public async Task<IEnumerable<string>> GetUserRoles(string userId)

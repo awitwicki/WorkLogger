@@ -1,6 +1,6 @@
 ﻿using WorkLogger.Domain.ViewModels;
 
-namespace WorkLogger.Domain.Services;
+namespace WorkLogger.Services;
 
 public interface IMonthDayService
 {

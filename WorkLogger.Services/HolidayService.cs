@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WorkLogger.Common.DateExtensions;
 using WorkLogger.Domain.Entities;
 using WorkLogger.Infrastructure.Database;
-using WorkLogger.Common.DateExtensions;
 
-namespace WorkLogger.Services.Services;
+namespace WorkLogger.Services;
 
 public class HolidayService : IHolidayService
 {

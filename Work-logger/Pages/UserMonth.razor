@@ -3,11 +3,10 @@
 @attribute [Authorize(Roles = Consts.AdminRole + "," + Consts.ModeratorRole)]
 
 @using WorkLogger.Domain.ViewModels
-@using WorkLogger.Services.Services
-@using WorkLogger.Domain.Services
 @using WorkLogger.Pages.Shared
 @using System.Security.Claims
 @using WorkLogger.Common.AspExtensions
+@using WorkLogger.Services
 
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 @inject IJSRuntime js
