@@ -1,6 +1,6 @@
 # Blazor-starter
 
-.NET 7.0 Blazor based serverside web app for log work hours.
+.NET 8.0 Blazor based serverside web app for log work hours.
 
 ![License](https://img.shields.io/badge/License-Apache%20License%202.0-blue)
 ![Tests](https://img.shields.io/badge/dotnet%20version-8.0-blue)
