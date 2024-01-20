@@ -45,6 +45,23 @@ public class HolidayService : IHolidayService
         _dbContext.Entry(entity.Entity).State = EntityState.Detached;
     }
 
+    public async Task ImportHolidays(IList<Holiday> holidaysToAdd)
+    {
+        var holidaysInDb = await _dbContext.Holidays.AsNoTracking().ToListAsync();
+        var holidaysInDbDates = holidaysInDb.Select(x => x.DateDay).ToList();
+
+        holidaysToAdd = holidaysToAdd.Where(x => !holidaysInDbDates.Contains(x.DateDay)).ToList();
+        await _dbContext.AddRangeAsync(holidaysToAdd);
+
+        await _dbContext.SaveChangesAsync();
+        
+        // Stop tracking
+        foreach (var newHoliday in holidaysToAdd)
+        {
+            _dbContext.Entry(newHoliday).State = EntityState.Detached;
+        }
+    }
+
     public async Task<bool> RemoveHoliday(DateOnly date)
     {
         var holiday = await _dbContext.Holidays.AsNoTracking()

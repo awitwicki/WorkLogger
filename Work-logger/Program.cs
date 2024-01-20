@@ -95,15 +95,6 @@ using (var scope = app.Services.CreateScope())
             roleManager.CreateAsync(new IdentityRole(roleName)).Wait();
         }
     }
-    
-    // Init Holidays
-    if (!context.Holidays.Any())
-    {
-        var holidaysToAdd = HolidaysHelpers.GetHolidays2023();
-        
-        context.Holidays.AddRange(holidaysToAdd);
-        context.SaveChanges();
-    }
 }
 
 app.UseHttpsRedirection();

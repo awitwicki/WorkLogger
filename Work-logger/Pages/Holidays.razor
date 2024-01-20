@@ -3,6 +3,7 @@
 @attribute [Authorize(Roles = Consts.AdminRole + "," + Consts.ModeratorRole)]
 
 @using System.Security.Claims
+@using WorkLogger.Common
 @using WorkLogger.Common.DateExtensions
 @using WorkLogger.Domain.Entities
 @using WorkLogger.Pages.Shared
@@ -44,6 +45,9 @@
             <MudDatePicker Class="my-2" @bind-Date="_selectedDate" Label="Select date" Variant="Variant.Outlined"/>
             <MudTextField @bind-Value="_holidayName" Label="Holiday name" Variant="Variant.Outlined"/>
             <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="AddHoliday" Disabled="@(_holidays == null)">Add holiday</MudButton>
+            <MudDivider />
+            <MudText Class="mt-4" Typo="Typo.h6">Synchronize holidays</MudText>
+            <MudButton Class="my-4" Variant="Variant.Filled" Color="Color.Success" OnClick="AddHolidays2024" Disabled="@(_holidays == null)">Add 2024 holidays</MudButton>
         </MudPaper>
     </MudItem>
 </MudGrid>
@@ -87,6 +91,17 @@
         
         await ReloadView();
         Snackbar.Add("Saved");
+    }
+
+    private async Task AddHolidays2024()
+    {
+        var holidaysToAdd = HolidaysHelpers.GetHolidays2024();
+
+        await HolidayService.ImportHolidays(holidaysToAdd);
+        
+        await ReloadView();
+
+        Snackbar.Add("Holidays for 2024 are synchronized");
     }
 
     public async Task RemoveHoliday(Holiday holiday)
