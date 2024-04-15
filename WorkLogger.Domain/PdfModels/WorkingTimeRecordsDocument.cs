@@ -56,7 +56,7 @@ public class WorkingTimeRecordsDocument : IDocument
             .PaddingVertical(10)
             .Table(table =>
             {
-                // step 1
+                // Step 1
                 table.ColumnsDefinition(columns =>
                 {
                     columns.ConstantColumn(70);
@@ -65,7 +65,7 @@ public class WorkingTimeRecordsDocument : IDocument
                     columns.RelativeColumn();
                 });
                 
-                // step 2
+                // Step 2
                 table.Header(header =>
                 {
                     var textStyle = TextStyle.Default.SemiBold().FontColor(Colors.White);
@@ -85,10 +85,10 @@ public class WorkingTimeRecordsDocument : IDocument
                     }
                 });
                 
-                // step 3
+                // Step 3
                 foreach (var day in Model.Days)
                 {
-                    var isWeekend = !(day.IsVacation || day.IsDayOff);
+                    var isWeekend = !day.IsDayOff;
                     
                     table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(day.Date.ToString("dd.MM"));
                     table.Cell().Element(x => isWeekend ? CellStyle(x) : CellStyleWeekend(x)).Text(!(day.IsVacationOrL4 || day.IsDayOff) ? day.StartHour?.ToString(@"hh\:mm") : "");
