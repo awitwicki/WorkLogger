@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using WorkLogger.Domain.Entities;
 using WorkLogger.Domain.ViewModels;
 using WorkLogger.Infrastructure.Database;
 
@@ -10,17 +11,17 @@ public class UsersService : IUsersService
 {
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<UsersService> _logger;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public UsersService(ApplicationDbContext dbContext, ILogger<UsersService> logger, UserManager<IdentityUser> userManager)
+    public UsersService(ApplicationDbContext dbContext, ILogger<UsersService> logger, UserManager<ApplicationUser> userManager)
     {
         _dbContext = dbContext;
         _logger = logger;
         _userManager = userManager;
     }
 
-    private List<String> GetUserRoles(string userId, ICollection<IdentityRole> roles,
-        ICollection<IdentityUserRole<string>> userRoles)
+    private List<String> GetUserRoles(Guid userId, ICollection<ApplicationRole> roles,
+        ICollection<IdentityUserRole<Guid>> userRoles)
     {
         var assignedUserRoles = userRoles.Where(y => y.UserId == userId).ToList();
         var assignedUserRolesId = assignedUserRoles.Select(x => x.RoleId).ToList();
@@ -48,20 +49,21 @@ public class UsersService : IUsersService
         return result;
     }
     
-    public async Task AddRoleToUser(string userId, string roleName)
+    public async Task AddRoleToUser(Guid userId, string roleName)
     {
         try
         {
-            var role = await _dbContext.Roles.AsNoTracking().FirstAsync(x => x.Name == roleName);
-
-            var identityUserRole = new IdentityUserRole<string>
-            {
-                UserId = userId,
-                RoleId = role.Id
-            };
+            // var user = new ApplicationUser { Id = userId };
+            //
+            //
+            // _dbContext.Entry(user).State = EntityState.Detached; ???
             
-            await _dbContext.UserRoles.AddAsync(identityUserRole);
-            await _dbContext.SaveChangesAsync();
+            var user = await _userManager.Users.SingleAsync(x => x.Id == userId);
+            //var role = await _dbContext.Roles.AsNoTracking().FirstAsync(x => x.Name == roleName);
+
+            await _userManager.AddToRoleAsync(user, roleName);
+           
+            //await _dbContext.SaveChangesAsync(); ?
         }
         catch (Exception e)
         {
@@ -70,9 +72,9 @@ public class UsersService : IUsersService
         }
     }
 
-    public async Task<IEnumerable<string>> GetUserRoles(string userId)
+    public async Task<IEnumerable<string>> GetUserRoles(Guid userId)
     {
-        IdentityUser user = new IdentityUser { Id = userId };
+        var user = new ApplicationUser { Id = userId };
 
         var userRoles = await _userManager.GetRolesAsync(user);
         
@@ -80,24 +82,17 @@ public class UsersService : IUsersService
         return userRoles;
     }
 
-    public async Task CleanUserRoles(string userId)
+    public async Task CleanUserRoles(Guid userId)
     {
         var rolesToRemove = await _dbContext.UserRoles.Where(x => x.UserId == userId).ToListAsync();
         _dbContext.UserRoles.RemoveRange(rolesToRemove);
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task RemoveUser(string userId)
+    public async Task RemoveUser(Guid userId)
     {
         var user = await _dbContext.Users.Where(x => x.Id == userId).FirstAsync();
         _dbContext.Users.Remove(user);
         await _dbContext.SaveChangesAsync();
-    }
-
-    public async Task<IEnumerable<IdentityRole>> GetAllRoles()
-    {
-        return await _dbContext.Roles
-            .AsNoTracking()
-            .ToListAsync();
     }
 }

@@ -22,3 +22,9 @@ networks:
     name: kodzuverse_network
     driver: bridge
     external: true
+
+  worklogger.api:
+    image: worklogger.api
+    build:
+      context: .
+      dockerfile: WorkLogger.Api/Dockerfile

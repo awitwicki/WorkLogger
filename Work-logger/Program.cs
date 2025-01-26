@@ -1,6 +1,9 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using WorkLogger.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MudBlazor.Services;
 using WorkLogger;
 using WorkLogger.Common;
@@ -20,25 +23,67 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options
          .UseNpgsql(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!));
 
 builder.Services.AddTransient<ApplicationDbContext>();
+//
+// builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+//         options.SignIn.RequireConfirmedAccount = false)
+//     .AddRoles<IdentityRole>()
+//     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-        options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+//
+// builder.Services.AddIdentityCore<IdentityRole>()
+//     .AddRoles<IdentityRole>()
+//     .AddEntityFrameworkStores<AppDbContext>()
+//     .AddApiEndpoints();
 
 
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
-builder.Services.AddAuthentication()
-    .AddGoogle(options =>
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}
+    )
+    .AddJwtBearer(x =>
     {
-        options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_ID")!;
-        options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_OAUTH_CLIENT_SECRET")!;
-    });
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    })
+    .AddBearerToken(IdentityConstants.BearerScheme);
 
-builder.Services.AddServerSideBlazor();
-builder.Services.AddMudServices();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationBuilder();
+
+builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+//builder.Services.AddServerSideBlazor();
+//builder.Services.AddMudServices();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 var config = new ConfigModel();
 if (config.HasErrors)
@@ -80,7 +125,7 @@ using (var scope = app.Services.CreateScope())
     // Migration
     if (context.Database.IsNpgsql())
     {
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
     }
 
     // Init roles
@@ -97,19 +142,30 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+
+app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// app.MapControllers();
 
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
-    endpoints.MapBlazorHub();
-    endpoints.MapFallbackToPage("/_Host");
+   // endpoints.MapBlazorHub();
+   // endpoints.MapFallbackToPage("/_Host");
 });
 
 app.Run();

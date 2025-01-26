@@ -236,8 +236,8 @@ else
     
     async Task AddUserRole(string userId)
     {
-        var roles = await UsersService.GetAllRoles();
-        var rolesStr = roles.Select(x => new SimpleSelectDialog.SimpleSelectDialogItem { Id = x.Id, Name = x.Name }).ToList();
+        //var roles = await UsersService.GetAllRoles();
+        //var rolesStr = roles.Select(x => new SimpleSelectDialog.SimpleSelectDialogItem { Id = x.Id, Name = x.Name }).ToList();
 
         var parameters = new DialogParameters();
 
@@ -245,7 +245,7 @@ else
         parameters.Add("ContentText", "Select user role ");
         parameters.Add("ButtonText", "Dodaj");
         parameters.Add("Color", Color.Success);
-        parameters.Add("Items", rolesStr);
+      //  parameters.Add("Items", rolesStr);
 
         var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 

@@ -111,7 +111,7 @@ else
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
     ClaimsPrincipal _user;
-    string _userId = "";
+    Guid _userId = Guid.Empty;
 
     [Parameter]
     public string? Date { get; set; }
@@ -119,7 +119,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         _user = (await AuthStat).User;
-        _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+       // _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
         if (!string.IsNullOrEmpty(Date))
         {

@@ -32,7 +32,7 @@
     
     [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
     ClaimsPrincipal _user;
-    string _userId = "";
+    Guid _userId = Guid.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,7 +41,7 @@
         // TODO:
         // Refactor to single method
         // Get user Id
-        _userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        //_userId = _user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         _settings = await EmployeeSettingsService.GetEmployeeSettings(_userId);
 
         await InitFields();

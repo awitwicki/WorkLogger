@@ -1,6 +1,9 @@
 .idea
 .vs
+node_modules/
+workLogger.client/
 bin/
 obj/
-
+.DS_Store
 .env
+/workLogger.client

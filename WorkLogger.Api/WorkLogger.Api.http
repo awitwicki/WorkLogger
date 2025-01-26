@@ -1,0 +1,6 @@
+@WorkLogger.Api_HostAddress = http://localhost:5277
+
+GET {{WorkLogger.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

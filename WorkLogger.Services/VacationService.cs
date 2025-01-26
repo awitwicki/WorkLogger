@@ -12,7 +12,7 @@ public class VacationService : IVacationService
         _dbContext = dbContext;
     }
 
-    public async Task<int> GetVacationDaysLeftForUser(string employeeId)
+    public async Task<int> GetVacationDaysLeftForUser(Guid employeeId)
     {
         var resultEmployeeSettings = await _dbContext.EmployeeSettings.AsNoTracking()
             .FirstAsync(x => x.EmployeeId == employeeId);

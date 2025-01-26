@@ -4,6 +4,6 @@ namespace WorkLogger.Services;
 
 public interface IEmployeeSettingsService
 {
-    Task<EmployeeSettings> GetEmployeeSettings(string employeeId);
+    Task<EmployeeSettings> GetEmployeeSettings(Guid employeeId);
     Task SaveOrUpdateEmployeeSettings(EmployeeSettings employeeSettings);
 }

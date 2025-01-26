@@ -133,7 +133,7 @@ public class MapMonthDaysTests
         var month = new MonthWorkDay
         {
             DateMonth = DateTimeOffset.Now,
-            EmployeeId = "!23123",
+            EmployeeId = Guid.NewGuid(),
             Days = mapper.Map<List<MonthWorkDayItem>>(days),
         };
         

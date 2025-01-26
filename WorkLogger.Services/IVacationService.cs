@@ -2,5 +2,5 @@
 
 public interface IVacationService
 {
-    Task<int> GetVacationDaysLeftForUser(string employeeId);
+    Task<int> GetVacationDaysLeftForUser(Guid employeeId);
 }

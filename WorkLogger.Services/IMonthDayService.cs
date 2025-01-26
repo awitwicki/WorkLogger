@@ -5,8 +5,8 @@ namespace WorkLogger.Services;
 public interface IMonthDayService
 {
     Task<IEnumerable<WorkDayViewModel>> BuildMonth(DateTimeOffset date);
-    Task<IEnumerable<WorkDayViewModel>> GetDaysInMonth(DateTimeOffset date, string userId);
-    Task<UserWorkMonthViewModel> GetMonth(DateTimeOffset date, string userId);
-    Task SaveMonth(IEnumerable<WorkDayViewModel> days, DateTimeOffset date, string userId);
-    Task<IEnumerable<UserWorkMonthViewModel>> GetUserMonths(string userId);
+    Task<IEnumerable<WorkDayViewModel>> GetDaysInMonth(DateTimeOffset date, Guid userId);
+    Task<UserWorkMonthViewModel> GetMonth(DateTimeOffset date, Guid userId);
+    Task SaveMonth(IEnumerable<WorkDayViewModel> days, DateTimeOffset date, Guid userId);
+    Task<IEnumerable<UserWorkMonthViewModel>> GetUserMonths(Guid userId);
 }

@@ -56,7 +56,7 @@ public class MonthDayService : IMonthDayService
         return month;
     }
 
-    public async Task<IEnumerable<WorkDayViewModel>> GetDaysInMonth(DateTimeOffset date, string userId)
+    public async Task<IEnumerable<WorkDayViewModel>> GetDaysInMonth(DateTimeOffset date, Guid userId)
     {
         // Truncate date to month
         date = date.TruncateToMonth();
@@ -90,7 +90,7 @@ public class MonthDayService : IMonthDayService
         return null;
     }
 
-    public async Task<UserWorkMonthViewModel> GetMonth(DateTimeOffset date, string userId)
+    public async Task<UserWorkMonthViewModel> GetMonth(DateTimeOffset date, Guid userId)
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
@@ -120,7 +120,7 @@ public class MonthDayService : IMonthDayService
         return userWorkMonthDto;
     }
 
-    public async Task SaveMonth(IEnumerable<WorkDayViewModel> days, DateTimeOffset date, string userId)
+    public async Task SaveMonth(IEnumerable<WorkDayViewModel> days, DateTimeOffset date, Guid userId)
     {
         // Truncate date to month
         date = new DateTimeOffset(date.Year, date.Month, 1, 0, 0, 0, TimeSpan.Zero);
@@ -156,7 +156,7 @@ public class MonthDayService : IMonthDayService
         _dbContext.Entry(month).State = EntityState.Detached;
     }
 
-    public async Task<IEnumerable<UserWorkMonthViewModel>> GetUserMonths(string userId)
+    public async Task<IEnumerable<UserWorkMonthViewModel>> GetUserMonths(Guid userId)
     {
         var months = await _dbContext.MonthWorkDays.AsNoTracking()
             .Where(x => x.EmployeeId == userId)

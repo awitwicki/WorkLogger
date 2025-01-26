@@ -13,7 +13,7 @@ public class EmployeeSettingsService : IEmployeeSettingsService
         _dbContext = dbContext;
     }
     
-    public async Task<EmployeeSettings> GetEmployeeSettings(string employeeId)
+    public async Task<EmployeeSettings> GetEmployeeSettings(Guid employeeId)
     {
         var result = await _dbContext.EmployeeSettings.AsNoTracking()
             .FirstOrDefaultAsync(x => x.EmployeeId == employeeId);
