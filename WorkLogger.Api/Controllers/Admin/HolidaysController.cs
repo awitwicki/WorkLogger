@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WorkLogger.Common;
+using WorkLogger.Common.DateExtensions;
+using WorkLogger.Domain.DTOs;
 using WorkLogger.Domain.Entities;
 using WorkLogger.Services;
 
 namespace WorkLogger.Api.Controllers.Admin;
 
+[ApiController]
 [Route("[controller]")]
 [Authorize(Roles = ApplicationRoles.Admin)]
 public class HolidaysController: ControllerBase
@@ -28,9 +31,9 @@ public class HolidaysController: ControllerBase
     
     [HttpPost]
     [Route("add")]
-    public async Task<IActionResult> AddHoliday(DateOnly date, string name)
+    public async Task<IActionResult> AddHoliday([FromBody] HolidayDto dto)
     {
-        await _holidayService.AddHoliday(date, name);
+        await _holidayService.AddHoliday(dto.Date.ToDateOnly(), dto.Name);
         
         return Ok();
     }
@@ -47,9 +50,9 @@ public class HolidaysController: ControllerBase
     
     [HttpPost]
     [Route("remove")]
-    public async Task<IActionResult> RemoveHoliday(DateOnly date)
+    public async Task<IActionResult> RemoveHoliday([FromBody] DateTime date)
     {
-        var result = await _holidayService.RemoveHoliday(date);
+        var result = await _holidayService.RemoveHoliday(date.ToDateOnly());
         
         return Ok(new { wasInDatabase = result});
     }

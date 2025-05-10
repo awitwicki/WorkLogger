@@ -6,13 +6,6 @@ export const setGetState = (fn) => {
     getState = fn; // Передаємо функцію отримання стейту
 };
 
-// export const getToken = () => {
-//     const state = store.getState();
-//     return state.auth.userJwtToken;
-// };
-//
-
-
 const anonymousApiClient = async (endpoint, options = {}) => {
     const baseUrl = consts.baseUrl;
 
@@ -35,7 +28,7 @@ const apiClient = (endpoint, { method = 'GET', body = null, headers = {} } = {})
     const baseUrl = consts.baseUrl
 
     const token = getState ? getState().auth.userJwtToken : null;
-    
+
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }

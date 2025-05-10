@@ -14,6 +14,6 @@ public class GetMeController: ControllerBase
     [HttpGet]
     public IActionResult GetMe()
     {
-        return Ok();
+        return Ok(new {ok="ok"});
     }
 }

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux'
+import React, { useEffect } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
     Container,
     Header,
@@ -15,7 +15,7 @@ import {
 } from 'rsuite';
 import GearIcon from '@rsuite/icons/Gear';
 import OffRoundIcon from '@rsuite/icons/OffRound';
-import {Icon} from "@rsuite/icons";
+import { Icon } from "@rsuite/icons";
 import {
     MdDashboard,
     MdGroup,
@@ -23,13 +23,19 @@ import {
     MdOutlineKeyboardArrowRight,
 } from "react-icons/md";
 import { MdHolidayVillage } from "react-icons/md";
-import {FaReact} from "react-icons/fa";
-import { logout } from './AuthSlice'
+import { FaReact } from "react-icons/fa";
+import { logout } from './AuthSlice';
+import { checkUserStatus } from './authThunks';
+
 
 const Layout = ({ children }) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const [expand, setExpand] = React.useState(true);
-    
+
+    useEffect(() => {
+        dispatch(checkUserStatus());
+         }, [dispatch]);
+
     const NavToggle = ({ expand, onChange }) => {
         return (
             <Stack className="nav-toggle" justifyContent={expand ? 'flex-end' : 'center'}>
@@ -74,7 +80,7 @@ const Layout = ({ children }) => {
                             <Nav.Item eventKey="3" icon={<Icon as={MdHolidayVillage} />} as={Link} to="/holidays">
                                 Holidays
                             </Nav.Item>
-                            <Nav.Item eventKey="2" icon={<Icon as={MdGroup} />} as={Link} to="/users">
+                            <Nav.Item eventKey="4" icon={<Icon as={MdGroup} />} as={Link} to="/users">
                                 Users
                             </Nav.Item>
                         </Nav>

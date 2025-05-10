@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { loginWithGoogle } from './authThunks';
+import { loginWithGoogle, checkUserStatus } from './authThunks';
+
 
 const initialState = {
     loading: false,
@@ -8,18 +9,18 @@ const initialState = {
     userGoogleToken: null,
     error: null,
     success: false
-}
+};
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
         logout: (state) => {
-            state.loading = false
-            state.userInfo = null
-            state.userJwtToken = null
-            state.userGoogleToken = null
-            state.error = null
+            state.loading = false;
+            state.userInfo = null;
+            state.userJwtToken = null;
+            state.userGoogleToken = null;
+            state.error = null;
         },
         setCredentials: (state, { payload }) => {
             const userInfo = {
@@ -30,10 +31,10 @@ const authSlice = createSlice({
             state.userInfo = userInfo;
         },
         setGoogleToken: (state, { payload }) => {
-            state.userGoogleToken = payload
+            state.userGoogleToken = payload;
         },
         setJwtToken: (state, { payload }) => {
-            state.userJwtToken = payload
+            state.userJwtToken = payload;
         },
     },
     extraReducers: (builder) => {
@@ -49,11 +50,28 @@ const authSlice = createSlice({
                 authSlice.caseReducers.setCredentials(state, { payload: action.payload });
             })
             .addCase(loginWithGoogle.rejected, (state, action) => {
+                console.log('loginWithGoogle.rejected', action);
                 state.loading = false;
                 state.error = action.payload;
+            })
+            .addCase(checkUserStatus.pending, (state) => {
+                console.log('checkUserStatus.pending');
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(checkUserStatus.fulfilled, (state, action) => {
+                console.log('checkUserStatus.fulfilled', action);
+                state.loading = false;
+                //authSlice.caseReducers.setCredentials(state, { payload: action.payload });
+            })
+            .addCase(checkUserStatus.rejected, (state, action) => {
+                console.log('checkUserStatus.rejected', action);
+                state.loading = false;
+                state.error = action.payload;
+                authSlice.caseReducers.logout(state);
             });
     }
-})
+});
 
-export const { logout, setGoogleToken } = authSlice.actions
-export default authSlice.reducer
+export const { logout, setGoogleToken } = authSlice.actions;
+export default authSlice.reducer;
