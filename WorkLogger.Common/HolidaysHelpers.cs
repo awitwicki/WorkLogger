@@ -7,7 +7,7 @@ public static class HolidaysHelpers
 {
     public static IEnumerable<Holiday> GetHolidays2023()
     {
-        if (DateTime.Now.Year != 2023)
+        if (DateTime.UtcNow.Year != 2023)
         {
             throw new InvalidOperationException(
                 "This method is only valid for 2023, please Update method HolidaysHelpers.GetHolidays2023()");
@@ -36,7 +36,7 @@ public static class HolidaysHelpers
     
     public static IList<Holiday> GetHolidays2024()
     {
-        if (DateTime.Now.Year != 2024)
+        if (DateTime.UtcNow.Year != 2024)
         {
             throw new InvalidOperationException(
                 "This method is only valid for 2024 year");

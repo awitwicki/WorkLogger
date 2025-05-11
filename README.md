@@ -7,11 +7,26 @@
 
 ## How to run
 
-1. Create `.env` file and fill with necessary params (where `xxxxxxxxxx` is your secrets):
+1. Create `appsettings.Release.json` file and fill with necessary params:
     ```
-        DB_CONNECTION_STRING=xxxxxxxxxx
-        GOOGLE_OAUTH_CLIENT_ID=xxxxxxxxxx;
-        GOOGLE_OAUTH_CLIENT_SECRET=xxxxxxxxxx;
+      {
+         "ConnectionStrings": {
+            "DefaultConnection": "DB_CONNECTION_STRING"
+         },
+         "Cors": {
+            "AllowedOrigins": [
+               "http://example.com",
+               "http://another-origin.com"
+            ]
+         },
+         "GoogleClientId": "YOUR_GOOGLE_CLIENT_ID",
+         "Jwt": {
+            "Key": "SecretKey",
+            "Issuer": "appName",
+            "Audience": "appUsers"
+         }
+      }
    ```
 
 2. `docker-compose up --build -d`
+3. First registered user in database gets `Admin` role

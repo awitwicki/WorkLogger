@@ -20,8 +20,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddDataProtection();
 builder.Services.AddDbContext<ApplicationDbContext>(options => 
-    //options.UseInMemoryDatabase("InMemoryDb"));
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<ApplicationRole>()

@@ -39,7 +39,7 @@ public class OauthLoginController : ControllerBase
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -70,7 +70,7 @@ public class OauthLoginController : ControllerBase
                     Id = Guid.NewGuid(),
                     Email = payload.Email,
                     UserName = payload.Email,
-                    CreatedOn = DateTime.Now
+                    CreatedOn = DateTime.UtcNow
                 };
                 
                 await _userManager.CreateAsync(user);
