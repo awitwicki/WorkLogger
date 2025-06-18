@@ -7,7 +7,7 @@ const initialState = {
     userInfo: 'initial val',
     userJwtToken: null,
     userGoogleToken: null,
-    error: null,
+    error: false,
     success: false
 };
 
@@ -20,7 +20,7 @@ const authSlice = createSlice({
             state.userInfo = null;
             state.userJwtToken = null;
             state.userGoogleToken = null;
-            state.error = null;
+            state.error = false;
         },
         setCredentials: (state, { payload }) => {
             const userInfo = {
@@ -41,7 +41,6 @@ const authSlice = createSlice({
         builder
             .addCase(loginWithGoogle.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(loginWithGoogle.fulfilled, (state, action) => {
                 state.loading = false;
@@ -52,22 +51,22 @@ const authSlice = createSlice({
             .addCase(loginWithGoogle.rejected, (state, action) => {
                 console.log('loginWithGoogle.rejected', action);
                 state.loading = false;
-                state.error = action.payload;
+                state.error = true;
             })
             .addCase(checkUserStatus.pending, (state) => {
                 console.log('checkUserStatus.pending');
                 state.loading = true;
-                state.error = null;
             })
             .addCase(checkUserStatus.fulfilled, (state, action) => {
                 console.log('checkUserStatus.fulfilled', action);
                 state.loading = false;
                 //authSlice.caseReducers.setCredentials(state, { payload: action.payload });
+                state.error = false;
             })
             .addCase(checkUserStatus.rejected, (state, action) => {
                 console.log('checkUserStatus.rejected', action);
                 state.loading = false;
-                state.error = action.payload;
+                state.error = true;
                 authSlice.caseReducers.logout(state);
             });
     }

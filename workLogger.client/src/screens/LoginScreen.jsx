@@ -2,19 +2,20 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { useDispatch, useSelector } from 'react-redux'
-import { setGoogleToken } from './../AuthSlice'
-import { loginWithGoogle } from './../authThunks';
+import { setGoogleToken } from '../AuthSlice'
+import { loginWithGoogle } from '../authThunks';
 
 import {
-    Panel
+    Message,
+    Panel,
   } from 'rsuite';
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 
 const LoginScreen = () => {
-    
     const dispatch = useDispatch()
     const appStateUserInfo = useSelector((state) => state.auth.userInfo);
+    const authError = useSelector((state) => state.auth.error);
     const navigate = useNavigate();
 
     const handleLoginFailure = (error) => {
@@ -26,15 +27,13 @@ const LoginScreen = () => {
         dispatch(loginWithGoogle(response.credential));
     };
     
-    // Redirect authenticated user to profile screen
+    // Redirect authenticated user to the profile screen
     useEffect(() => {
         if (appStateUserInfo) {
             navigate('/')
         }
     }, [navigate, appStateUserInfo])
     
-    // Simple form in center of screen
-    // Centered form 
     return (
         <div
             className="app"
@@ -53,6 +52,11 @@ const LoginScreen = () => {
                     textAlign: 'center', // Center the header and content inside the panel
                 }}
             >
+                {authError &&
+                    <Message showIcon type="error" header="A problem occurred" style={{ marginBottom: '1rem' }}>
+                        Server temporary unavailable, try again later
+                    </Message>}
+               
                 <GoogleOAuthProvider clientId={CLIENT_ID}>
                     <div
                         style={{

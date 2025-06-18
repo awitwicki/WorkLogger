@@ -13,8 +13,6 @@ export const loginWithGoogle = createAsyncThunk(
             }
 
             return response.json();
-
-            // return data;
         } catch (error) {
             return rejectWithValue(error.message);
         }

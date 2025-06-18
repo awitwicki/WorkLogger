@@ -60,7 +60,7 @@ const HomeScreen = () => {
                     </p>
                     <ul>
                         Roles:
-                      {appStateUserInfo?.roles.map((str, index) => (
+                            {appStateUserInfo?.roles?.map((str, index) => (
                             <li key={str}>{str}</li> // Render each string as a list item
                         ))}
                     </ul>
