@@ -60,8 +60,8 @@ const authSlice = createSlice({
             .addCase(checkUserStatus.fulfilled, (state, action) => {
                 console.log('checkUserStatus.fulfilled', action);
                 state.loading = false;
-                //authSlice.caseReducers.setCredentials(state, { payload: action.payload });
                 state.error = false;
+                authSlice.caseReducers.setCredentials(state, { payload: action.payload });
             })
             .addCase(checkUserStatus.rejected, (state, action) => {
                 console.log('checkUserStatus.rejected', action);
