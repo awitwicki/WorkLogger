@@ -1,8 +1,6 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkLogger.Domain.Entities;
-using WorkLogger.Domain.ViewModels;
-using WorkLogger.Services;
 
 namespace WorkLogger.Api.Controllers.User;
 
@@ -10,10 +8,12 @@ namespace WorkLogger.Api.Controllers.User;
 [Authorize]
 public class GetMeController: ControllerBase
 {
-    
     [HttpGet]
     public IActionResult GetMe()
     {
-        return Ok(new {ok="ok"});
+        var name = User.FindFirstValue(ClaimTypes.Name);
+        var roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray();
+
+        return Ok(new { name, roles });
     }
 }

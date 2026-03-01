@@ -1,10 +1,8 @@
-// import './App.less';
 import 'rsuite/styles/index.less';
 import 'rsuite/dist/rsuite.min.css';
 import React from 'react';
 import { CustomProvider } from 'rsuite';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import Layout from './Layout';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
@@ -13,6 +11,8 @@ import Unauthorized from "./screens/Unauthorized";
 import MonthScreen from "./screens/MonthScreen";
 import HolidaysScreen from "./screens/HolidaysScreen";
 import UsersScreen from "./screens/UsersScreen";
+import AdminMonthScreen from "./screens/AdminMonthScreen";
+import SettingsScreen from "./screens/SettingsScreen";
 
 function App() {
     // TODO rework to redux state
@@ -33,9 +33,10 @@ function App() {
                         <Route element={<ProtectedRoute/>}>
                             <Route path="/" element={<HomeScreen/>}/>
                             <Route path="/month" element={<MonthScreen/>}/>
-                            <Route path="/profile" element={<Unauthorized/>}/>
+                            <Route path="/settings" element={<SettingsScreen/>}/>
                             <Route path="/holidays" element={<HolidaysScreen/>}/>
                             <Route path="/users" element={<UsersScreen/>}/>
+                            <Route path="/admin/month" element={<AdminMonthScreen/>}/>
                         </Route>
                     </Route>
 

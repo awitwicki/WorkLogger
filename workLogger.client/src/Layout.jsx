@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     Container,
     Header,
@@ -13,7 +13,6 @@ import {
     HStack,
     Text, Navbar
 } from 'rsuite';
-import GearIcon from '@rsuite/icons/Gear';
 import OffRoundIcon from '@rsuite/icons/OffRound';
 import { Icon } from "@rsuite/icons";
 import {
@@ -21,6 +20,9 @@ import {
     MdGroup,
     MdKeyboardArrowLeft,
     MdOutlineKeyboardArrowRight,
+    MdCalendarMonth,
+    MdAdminPanelSettings,
+    MdSettings
 } from "react-icons/md";
 import { MdHolidayVillage } from "react-icons/md";
 import { FaReact } from "react-icons/fa";
@@ -31,10 +33,12 @@ import { checkUserStatus } from './authThunks';
 const Layout = ({ children }) => {
     const dispatch = useDispatch();
     const [expand, setExpand] = React.useState(true);
+    const userInfo = useSelector((state) => state.auth.userInfo);
+    const isAdmin = userInfo?.roles?.includes('admin');
 
     useEffect(() => {
         dispatch(checkUserStatus());
-         }, [dispatch]);
+    }, [dispatch]);
 
     const NavToggle = ({ expand, onChange }) => {
         return (
@@ -74,15 +78,25 @@ const Layout = ({ children }) => {
                             <Nav.Item eventKey="1" icon={<Icon as={MdDashboard} />} as={Link} to="/">
                                 Dashboard
                             </Nav.Item>
-                            <Nav.Item eventKey="2" icon={<Icon as={MdGroup} />} as={Link} to="/month">
+                            <Nav.Item eventKey="2" icon={<Icon as={MdCalendarMonth} />} as={Link} to="/month">
                                 Month
                             </Nav.Item>
-                            <Nav.Item eventKey="3" icon={<Icon as={MdHolidayVillage} />} as={Link} to="/holidays">
-                                Holidays
+                            <Nav.Item eventKey="6" icon={<Icon as={MdSettings} />} as={Link} to="/settings">
+                                Settings
                             </Nav.Item>
-                            <Nav.Item eventKey="4" icon={<Icon as={MdGroup} />} as={Link} to="/users">
-                                Users
-                            </Nav.Item>
+                            {isAdmin && (
+                                <>
+                                    <Nav.Item eventKey="3" icon={<Icon as={MdHolidayVillage} />} as={Link} to="/holidays">
+                                        Holidays
+                                    </Nav.Item>
+                                    <Nav.Item eventKey="4" icon={<Icon as={MdGroup} />} as={Link} to="/users">
+                                        Users
+                                    </Nav.Item>
+                                    <Nav.Item eventKey="5" icon={<Icon as={MdAdminPanelSettings} />} as={Link} to="/admin/month">
+                                        Admin Months
+                                    </Nav.Item>
+                                </>
+                            )}
                         </Nav>
                     </Sidenav.Body>
                 </Sidenav>

@@ -96,13 +96,22 @@ builder.Services.AddSwaggerGen(
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp", policy =>
-    {
-        policy.WithOrigins("http://localhost:10001")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            if (builder.Environment.IsDevelopment())
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            }
+            else
+            {
+                policy.WithOrigins("https://url.com")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            }
+        });
 });
 
 //
